@@ -4,60 +4,80 @@
 //
 //  Created by Manoj Karki on 5/2/20.
 */
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* resetting browser stuff */
+*     {
+  box-sizing: border-box;
+}
+html,
+body   {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  font-size: 16px;
 }
 
-body {
-    background: #fff;
-    color: #000;
-    font-family: Helvetica, Arial;
-    text-align: center;
+/* styling our overall page */
+body     {
+  background: #FFF;
+  font-family: Arial, Helvetica, sans-serif;
 }
+
+/* styling our header */
+header   {
+  background: #222;
+  color: #FFF;
+  padding: 20px 70px;
+}
+
+/* logo */
+header #logo         {
+  display: inline-block;
+  color: #FFF;
+  text-decoration: none;
+  width: 19%;
+}
+header #logo img    {
+  width: 75px;
+  border-radius: 3px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+header #logo span   {
+  display: inline-block;
+}
+
+/* main navigation */
+header #main-navigation {
+  width: 79%;
+  display: inline-block;
+  text-align: right;
+}
+header #main-navigation ul   {
+  list-style: none;
+  padding: 0
+  margin: 0;
+}
+header #main-navigation ul li {
+  display: inline-block;
+}
+header #main-navigation ul li a    {
+  color: #FFF;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 3px;
+  /*transition: 0.3s ease all;*/
+}
+header #main-navigation ul li a:hover   {
+  background: #444;
+}
+header #main-navigation ul li a.selected   {
+ border-bottom: 3px solid #ef7701;
+ text-decoration: none;
+}
+
 
 .wrapper {
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 40px;
-    text-align: left;
-}
-
-header {
-    background-color: #eee;
-}
-
-header .wrapper {
-    padding-top: 30px;
-    padding-bottom: 30px;
-    text-align: center;
-}
-
-header a {
-    text-decoration: none;
-}
-
-header .site-name {
-    font-size: 1.5em;
-    color: #000;
-    font-weight: bold;
-}
-
-nav {
-    margin-top: 20px;
-}
-
-nav li {
-    display: inline-block;
-    margin: 0 7px;
-    line-height: 1.5em;
-}
-
-nav li a.selected {
-    text-decoration: underline;
+    padding: 40px 40px;
 }
 
 h1 {
@@ -87,6 +107,7 @@ a {
     border-radius: 20px;
     background-color: #eee;
     margin-bottom: 20px;
+    text-align: center;
 }
 
 .item-list > li:last-child {
@@ -104,6 +125,7 @@ a {
 
 .tag-list {
     margin-bottom: 15px;
+    text-align: center;
 }
 
 .tag-list-swift {
@@ -178,13 +200,12 @@ a {
     text-decoration: none;
 }
 
-
 .item-page .tag-list {
     display: inline-block;
 }
 
 .content {
-    margin-bottom: 40px;
+    margin: 40px;    
 }
 
 .browse-all {
@@ -195,11 +216,13 @@ a {
 .all-tags li {
     font-size: 1.4em;
     margin-right: 10px;
+    margin-bottom: 10px;
     padding: 6px 10px;
 }
 
 footer {
     color: #8a8a8a;
+    text-align: center;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -221,10 +244,62 @@ footer {
     }
 }
 
-@media(max-width: 600px) {
-    .wrapper {
-        padding: 40px 20px;
-    }
+
+/* responsive */
+/* mobile devices */
+
+@media screen and (max-width:640px) {
+  body   {
+    font-size: 14px;
+  }
+
+  /* header responsive */
+  header #logo   {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  header #main-navigation     {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+  header #main-navigation a   {
+    font-size: 12px;
+  }
+  .wrapper {
+      padding: 40px 20px;
+  }
+}
+
+@media screen and (max-width:460px) {
+  body   {
+    font-size: 14px;
+  }
+
+  /* header responsive */
+  header #logo   {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  header #main-navigation ul    {
+    padding: 0px;
+    margin: 0px;
+  }
+  header #main-navigation ul li {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .wrapper {
+      padding: 40px 20px;
+  }
 }
 
 /*Syntax highlight*/
