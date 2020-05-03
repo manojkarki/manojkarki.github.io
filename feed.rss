@@ -1,4 +1,34 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://www.yoswift.com</link><language>en</language><lastBuildDate>Sun, 3 May 2020 00:02:55 +0200</lastBuildDate><pubDate>Sun, 3 May 2020 00:02:55 +0200</pubDate><ttl>250</ttl><atom:link href="https://www.yoswift.com/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://www.yoswift.com/swiftui/swiftui-with-uilabel</guid><title>Using UILabel in SwiftUI</title><description>How to use a multiline UILabel in SwiftUI.</description><link>https://www.yoswift.com/swiftui/swiftui-with-uilabel</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Using UILabel in SwiftUI</h1><p>But why 😀 well sometime using SwiftUI in an existing App force you to do so.</p><p>So here is a SwiftUI View using <code></code><code>Text</code><code></code></p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://www.yoswift.com</link><language>en</language><lastBuildDate>Sun, 3 May 2020 09:37:10 +0200</lastBuildDate><pubDate>Sun, 3 May 2020 09:37:10 +0200</pubDate><ttl>250</ttl><atom:link href="https://www.yoswift.com/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://www.yoswift.com/swiftui/swiftui-conditional-view</guid><title>Conditionally render a different View</title><description>How to conditionally render a different View</description><link>https://www.yoswift.com/swiftui/swiftui-conditional-view</link><pubDate>Sun, 3 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Conditionally render a different View</h1><p>Well, most of the SwiftUI beginner do try this which compiler won't compile</p><br /><pre><code><span class="keyword">func</span> textOrImage(<span class="keyword">_</span> text: <span class="type">Bool</span>) -&gt; <span class="keyword">some</span> <span class="type">View</span> {
+    text ? <span class="type">Text</span>(<span class="string">"Hello"</span>) : <span class="type">Image</span>(systemName: <span class="string">"headphones"</span>)
+}
+</code></pre><br /><p>If you don't understand why, read about <a href="https://docs.swift.org/swift-book/LanguageGuide/OpaqueTypes.html"><code></code><code>some</code><code></code></a> keyword,</p><p>in short it is a shorthand to avoid writing long generic types but still compiler will check that function returns the same concrete type from all return paths.</p><br /><p>Also don't even try to do this</p><pre><code><span class="keyword">func</span> textOrImage(<span class="keyword">_</span> text: <span class="type">Bool</span>) -&gt; <span class="type">Group</span> {
+    text ? <span class="type">Group</span> { <span class="type">Text</span>(<span class="string">"Hello"</span>) } : <span class="type">Group</span> { <span class="type">Image</span>(systemName: <span class="string">"headphones"</span>) }
+}
+</code></pre><br /><p>Group is a generic so a concrete type is <code></code><code>Group&lt;Text&gt;</code><code></code> or <code></code><code>Group&lt;Image&gt;</code><code></code>, but you can't return both.</p><br /><p>Type erased view <a href="https://developer.apple.com/documentation/swiftui/anyview">AnyView</a> can be used here.</p><pre><code><span class="keyword">func</span> textOrImage(<span class="keyword">_</span> text: <span class="type">Bool</span>) -&gt; <span class="type">AnyView</span> {
+    text ? <span class="type">AnyView</span>(<span class="type">Text</span>(<span class="string">"Hello"</span>)) : <span class="type">AnyView</span>(<span class="type">Image</span>(systemName: <span class="string">"headphones"</span>))
+}
+</code></pre><br /><p>But important to note this from the documentation.</p><p><em>"Whenever the type of view used with an AnyView changes, the old hierarchy is destroyed and a new hierarchy is created for the new type."</em></p><br /><p>One implication of this is that, as SwiftUI system need to discard the whole view hierarchy, in some case it mess with the animation (more on it later).</p><br /><p>Another way is to do something like this</p><pre><code><span class="keyword">func</span> textOrNil(<span class="keyword">_</span> text: <span class="type">Bool</span>) -&gt; <span class="type">Text</span>? {
+    <span class="keyword">guard</span> text <span class="keyword">else</span> { <span class="keyword">return nil</span> }
+    <span class="keyword">return</span> <span class="type">Text</span>(<span class="string">"Hello"</span>)
+}
+
+<span class="keyword">func</span> imageOrNil(<span class="keyword">_</span> text: <span class="type">Bool</span>) -&gt; <span class="type">Image</span>? {
+    <span class="keyword">guard</span> text <span class="keyword">else</span> { <span class="keyword">return</span> <span class="type">Image</span>(systemName: <span class="string">"headphones"</span>) }
+    <span class="keyword">return nil</span>
+}
+</code></pre><br /><p>It is perfectly fine to then use these methods like below</p><pre><code><span class="keyword">var</span> isText: <span class="type">Bool
+VStack</span> {
+    <span class="call">textOrNil</span>(isText)
+    <span class="call">imageOrNil</span>(isText)
+}
+
+<span class="comment">//same as wiring</span>
+<span class="type">VStack</span> {
+    <span class="type">ViewBuilder</span>.<span class="call">buildIf</span>(<span class="call">textOrNil</span>(isText))
+    <span class="type">ViewBuilder</span>.<span class="call">buildIf</span>(<span class="call">imageOrNil</span>(isText))
+}
+
+</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://www.yoswift.com/swiftui/swiftui-with-uilabel</guid><title>Using UILabel in SwiftUI</title><description>How to use a multiline UILabel in SwiftUI.</description><link>https://www.yoswift.com/swiftui/swiftui-with-uilabel</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Using UILabel in SwiftUI</h1><p>But why 😀 well sometime using SwiftUI in an existing App force you to do so.</p><p>So here is a SwiftUI View using <code></code><code>Text</code><code></code></p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
     <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
         <span class="type">VStack</span> {
             <span class="type">Text</span>(<span class="string">"This is a SwiftUI text which is easy to use but you need to understand the SwiftUI layout engine."</span>)

@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="og:site_name" content="YoSwift!"/><link rel="canonical" href="https://www.yoswift.com/swiftui/swiftui-conditional-view"/><meta name="twitter:url" content="https://www.yoswift.com/swiftui/swiftui-conditional-view"/><meta name="og:url" content="https://www.yoswift.com/swiftui/swiftui-conditional-view"/><title>Conditionally render a different View | YoSwift!</title><meta name="twitter:title" content="Conditionally render a different View | YoSwift!"/><meta name="og:title" content="Conditionally render a different View | YoSwift!"/><meta name="description" content="How to conditionally render a different View"/><meta name="twitter:description" content="How to conditionally render a different View"/><meta name="og:description" content="How to conditionally render a different View"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to YoSwift!"/><meta name="twitter:image" content="https://www.yoswift.com/images/logo.png"/><meta name="og:image" content="https://www.yoswift.com/images/logo.png"/></head><body class="item-page"><header><div class="wrapper"><a class="site-name" href="/"><img src="/images/logo.png"/></a><nav><ul><li><a class="selected" href="/swiftui">SwiftUI tips</a></li><li><a href="/swift">Swift tips</a></li><li><a href="/combine">Combine tips</a></li><li><a href="/about">About</a></li></ul></nav></div></header><div class="wrapper"><article><div class="content"><h1>Conditionally render a different View</h1><p>Well, most of the SwiftUI beginner do try this which compiler won't compile</p><br /><pre><code><span class="keyword">func</span> textOrImage(<span class="keyword">_</span> text: <span class="type">Bool</span>) -&gt; <span class="keyword">some</span> <span class="type">View</span> {
+    text ? <span class="type">Text</span>(<span class="string">"Hello"</span>) : <span class="type">Image</span>(systemName: <span class="string">"headphones"</span>)
+}
+</code></pre><br /><p>If you don't understand why, read about <a href="https://docs.swift.org/swift-book/LanguageGuide/OpaqueTypes.html"><code></code><code>some</code><code></code></a> keyword,</p><p>in short it is a shorthand to avoid writing long generic types but still compiler will check that function returns the same concrete type from all return paths.</p><br /><p>Also don't even try to do this</p><pre><code><span class="keyword">func</span> textOrImage(<span class="keyword">_</span> text: <span class="type">Bool</span>) -&gt; <span class="type">Group</span> {
+    text ? <span class="type">Group</span> { <span class="type">Text</span>(<span class="string">"Hello"</span>) } : <span class="type">Group</span> { <span class="type">Image</span>(systemName: <span class="string">"headphones"</span>) }
+}
+</code></pre><br /><p>Group is a generic so a concrete type is <code></code><code>Group&lt;Text&gt;</code><code></code> or <code></code><code>Group&lt;Image&gt;</code><code></code>, but you can't return both.</p><br /><p>Type erased view <a href="https://developer.apple.com/documentation/swiftui/anyview">AnyView</a> can be used here.</p><pre><code><span class="keyword">func</span> textOrImage(<span class="keyword">_</span> text: <span class="type">Bool</span>) -&gt; <span class="type">AnyView</span> {
+    text ? <span class="type">AnyView</span>(<span class="type">Text</span>(<span class="string">"Hello"</span>)) : <span class="type">AnyView</span>(<span class="type">Image</span>(systemName: <span class="string">"headphones"</span>))
+}
+</code></pre><br /><p>But important to note this from the documentation.</p><p><em>"Whenever the type of view used with an AnyView changes, the old hierarchy is destroyed and a new hierarchy is created for the new type."</em></p><br /><p>One implication of this is that, as SwiftUI system need to discard the whole view hierarchy, in some case it mess with the animation (more on it later).</p><br /><p>Another way is to do something like this</p><pre><code><span class="keyword">func</span> textOrNil(<span class="keyword">_</span> text: <span class="type">Bool</span>) -&gt; <span class="type">Text</span>? {
+    <span class="keyword">guard</span> text <span class="keyword">else</span> { <span class="keyword">return nil</span> }
+    <span class="keyword">return</span> <span class="type">Text</span>(<span class="string">"Hello"</span>)
+}
+
+<span class="keyword">func</span> imageOrNil(<span class="keyword">_</span> text: <span class="type">Bool</span>) -&gt; <span class="type">Image</span>? {
+    <span class="keyword">guard</span> text <span class="keyword">else</span> { <span class="keyword">return</span> <span class="type">Image</span>(systemName: <span class="string">"headphones"</span>) }
+    <span class="keyword">return nil</span>
+}
+</code></pre><br /><p>It is perfectly fine to then use these methods like below</p><pre><code><span class="keyword">var</span> isText: <span class="type">Bool
+VStack</span> {
+    <span class="call">textOrNil</span>(isText)
+    <span class="call">imageOrNil</span>(isText)
+}
+
+<span class="comment">//same as wiring</span>
+<span class="type">VStack</span> {
+    <span class="type">ViewBuilder</span>.<span class="call">buildIf</span>(<span class="call">textOrNil</span>(isText))
+    <span class="type">ViewBuilder</span>.<span class="call">buildIf</span>(<span class="call">imageOrNil</span>(isText))
+}
+
+</code></pre></div><span>Tagged with: </span><br/><br/><ul class="tag-list-swiftui"><li><a href="/tags/swiftui">swiftui</a></li><li><a href="/tags/conditionalview">conditionalview</a></li><li><a href="/tags/some-view">some View</a></li><li><a href="/tags/anyview">AnyView</a></li></ul></article></div><footer><p>Coded in Swift, generated using <a href="https://github.com/johnsundell/publish">Publish</a></p><p><a href="/feed.rss">RSS feed</a></p></footer></body></html>
