@@ -35,6 +35,7 @@
         <span class="keyword">self</span>.<span class="property">navigationController</span>.<span class="call">pushViewController</span>(hostingController, animated: <span class="keyword">true</span>)
     }
 }
+
 </code></pre><br /><p>Make a small replacement for SwiftUI's NavigationLink.</p><br /><pre><code><span class="keyword">struct</span> MyNavigationLink&lt;Destination: <span class="type">View</span>, Content: <span class="type">View</span>&gt;: <span class="type">View</span> {
     <span class="keyword">@EnvironmentObject 
     var</span> router: <span class="type">Router</span>

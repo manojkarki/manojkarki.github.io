@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Sun, 3 May 2020 19:33:15 +0200</lastBuildDate><pubDate>Sun, 3 May 2020 19:33:15 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/swiftui/statusbar-style</guid><title>SwiftUI View and status bar style</title><description>How to change status bar style for each SwiftUI screen or View</description><link>https://yoswift.dev/swiftui/statusbar-style</link><pubDate>Sun, 3 May 2020 15:00:00 +0200</pubDate><content:encoded><![CDATA[<h1>SwiftUI View and status bar style</h1><p>In UIKit we can override preferredStatusBarStyle to change the status bar style.</p><br /><pre><code><span class="keyword">class</span> MyViewController: <span class="type">UIViewController</span> {
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Sun, 3 May 2020 19:34:22 +0200</lastBuildDate><pubDate>Sun, 3 May 2020 19:34:22 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/swiftui/statusbar-style</guid><title>SwiftUI View and status bar style</title><description>How to change status bar style for each SwiftUI screen or View</description><link>https://yoswift.dev/swiftui/statusbar-style</link><pubDate>Sun, 3 May 2020 15:00:00 +0200</pubDate><content:encoded><![CDATA[<h1>SwiftUI View and status bar style</h1><p>In UIKit we can override preferredStatusBarStyle to change the status bar style.</p><br /><pre><code><span class="keyword">class</span> MyViewController: <span class="type">UIViewController</span> {
     <span class="keyword">override var</span> preferredStatusBarStyle: <span class="type">UIStatusBarStyle</span> {
         <span class="keyword">return</span> .<span class="dotAccess">lightContent</span>
     }
@@ -35,6 +35,7 @@
         <span class="keyword">self</span>.<span class="property">navigationController</span>.<span class="call">pushViewController</span>(hostingController, animated: <span class="keyword">true</span>)
     }
 }
+
 </code></pre><br /><p>Make a small replacement for SwiftUI's NavigationLink.</p><br /><pre><code><span class="keyword">struct</span> MyNavigationLink&lt;Destination: <span class="type">View</span>, Content: <span class="type">View</span>&gt;: <span class="type">View</span> {
     <span class="keyword">@EnvironmentObject 
     var</span> router: <span class="type">Router</span>
@@ -86,30 +87,6 @@ VStack</span> {
     <span class="type">ViewBuilder</span>.<span class="call">buildIf</span>(<span class="call">imageOrNil</span>(isText))
 }
 
-</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/keyboard-height</guid><title>Keyboard handling using combine</title><description>Reactive way to handle keyboard height change</description><link>https://yoswift.dev/combine/keyboard-height</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Keyboard handling using combine</h1><pre><code><span class="keyword">static var</span> keyboardHeightPublisher: <span class="type">AnyPublisher</span>&lt;<span class="type">CGFloat</span>, <span class="type">Never</span>&gt; {
-    <span class="keyword">let</span> willShow = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillShowNotification</span>)
-        .<span class="call">map</span> { $0.(userInfo?[<span class="type">UIResponder</span>.<span class="property">keyboardFrameEndUserInfoKey</span>] <span class="keyword">as</span>? <span class="type">CGRect</span>)?.<span class="property">height</span> ?? <span class="number">0</span> }
-
-    <span class="keyword">let</span> willHide = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillHideNotification</span>)
-        .<span class="call">map</span> { <span class="keyword">_ in</span> <span class="type">CGFloat</span>(<span class="number">0</span>) }
-
-    <span class="keyword">return</span> <span class="type">MergeMany</span>(willShow, willHide)
-        .<span class="call">eraseToAnyPublisher</span>()
-}
-</code></pre><p>Now you can subscibe easily to keyboard height changes.</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
-    
-    <span class="keyword">@State 
-    private var</span> value: <span class="type">String</span>
-
-    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
-        <span class="type">TextField</span>(<span class="string">"Enter the value"</span>, text: $value)
-            .<span class="call">onReceive</span>(keyboardHeightPublisher) { keyboardHeight <span class="keyword">in
-                if</span> keyboardHeight &gt; <span class="number">0</span> {
-                    <span class="call">print</span>(<span class="string">"Move something up"</span>)
-                }
-            }
-    }
-}
 </code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swiftui/swiftui-with-uilabel</guid><title>Using UILabel in SwiftUI</title><description>How to use a multiline UILabel in SwiftUI.</description><link>https://yoswift.dev/swiftui/swiftui-with-uilabel</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Using UILabel in SwiftUI</h1><p>But why 😀 well sometime using SwiftUI in an existing App force you to do so.</p><p>So here is a SwiftUI View using <code></code><code>Text</code><code></code></p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
     <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
         <span class="type">VStack</span> {
@@ -160,4 +137,28 @@ VStack</span> {
 example1.<span class="property">value</span> = <span class="number">20</span>
 </code></pre><p>while below code will not compile with <span style="color:red"> error: cannot assign to property: 'value' is a 'let' constant </span></p><pre><code><span class="keyword">var</span> example2 = <span class="type">Example2</span>(value: <span class="number">10</span>)
 example2.<span class="property">value</span> = <span class="number">20</span>
-</code></pre><p>and by using private(set) you can provide a default value to your property, and initializer can be called</p><p>with or without an argument.</p>]]></content:encoded></item></channel></rss>
+</code></pre><p>and by using private(set) you can provide a default value to your property, and initializer can be called</p><p>with or without an argument.</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/keyboard-height</guid><title>Keyboard handling using combine</title><description>Reactive way to handle keyboard height change</description><link>https://yoswift.dev/combine/keyboard-height</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Keyboard handling using combine</h1><pre><code><span class="keyword">static var</span> keyboardHeightPublisher: <span class="type">AnyPublisher</span>&lt;<span class="type">CGFloat</span>, <span class="type">Never</span>&gt; {
+    <span class="keyword">let</span> willShow = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillShowNotification</span>)
+        .<span class="call">map</span> { $0.(userInfo?[<span class="type">UIResponder</span>.<span class="property">keyboardFrameEndUserInfoKey</span>] <span class="keyword">as</span>? <span class="type">CGRect</span>)?.<span class="property">height</span> ?? <span class="number">0</span> }
+
+    <span class="keyword">let</span> willHide = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillHideNotification</span>)
+        .<span class="call">map</span> { <span class="keyword">_ in</span> <span class="type">CGFloat</span>(<span class="number">0</span>) }
+
+    <span class="keyword">return</span> <span class="type">MergeMany</span>(willShow, willHide)
+        .<span class="call">eraseToAnyPublisher</span>()
+}
+</code></pre><p>Now you can subscibe easily to keyboard height changes.</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+    
+    <span class="keyword">@State 
+    private var</span> value: <span class="type">String</span>
+
+    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
+        <span class="type">TextField</span>(<span class="string">"Enter the value"</span>, text: $value)
+            .<span class="call">onReceive</span>(keyboardHeightPublisher) { keyboardHeight <span class="keyword">in
+                if</span> keyboardHeight &gt; <span class="number">0</span> {
+                    <span class="call">print</span>(<span class="string">"Move something up"</span>)
+                }
+            }
+    }
+}
+</code></pre>]]></content:encoded></item></channel></rss>
