@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Sun, 3 May 2020 19:34:22 +0200</lastBuildDate><pubDate>Sun, 3 May 2020 19:34:22 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/swiftui/statusbar-style</guid><title>SwiftUI View and status bar style</title><description>How to change status bar style for each SwiftUI screen or View</description><link>https://yoswift.dev/swiftui/statusbar-style</link><pubDate>Sun, 3 May 2020 15:00:00 +0200</pubDate><content:encoded><![CDATA[<h1>SwiftUI View and status bar style</h1><p>In UIKit we can override preferredStatusBarStyle to change the status bar style.</p><br /><pre><code><span class="keyword">class</span> MyViewController: <span class="type">UIViewController</span> {
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Sun, 3 May 2020 20:02:56 +0200</lastBuildDate><pubDate>Sun, 3 May 2020 20:02:56 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/swiftui/statusbar-style</guid><title>SwiftUI View and status bar style</title><description>How to change status bar style for each SwiftUI screen or View</description><link>https://yoswift.dev/swiftui/statusbar-style</link><pubDate>Sun, 3 May 2020 15:00:00 +0200</pubDate><content:encoded><![CDATA[<h1>SwiftUI View and status bar style</h1><p>In UIKit we can override preferredStatusBarStyle to change the status bar style.</p><br /><pre><code><span class="keyword">class</span> MyViewController: <span class="type">UIViewController</span> {
     <span class="keyword">override var</span> preferredStatusBarStyle: <span class="type">UIStatusBarStyle</span> {
         <span class="keyword">return</span> .<span class="dotAccess">lightContent</span>
     }
@@ -81,7 +81,7 @@ VStack</span> {
     <span class="call">imageOrNil</span>(isText)
 }
 
-<span class="comment">//same as wiring</span>
+<span class="comment">//which is same as writing</span>
 <span class="type">VStack</span> {
     <span class="type">ViewBuilder</span>.<span class="call">buildIf</span>(<span class="call">textOrNil</span>(isText))
     <span class="type">ViewBuilder</span>.<span class="call">buildIf</span>(<span class="call">imageOrNil</span>(isText))
@@ -97,7 +97,7 @@ VStack</span> {
         .<span class="call">frame</span>(width: <span class="number">200</span>)
     }
 }
-</code></pre><p>Because <code></code><code>Text</code><code></code> has no frame, it gets it width from the parent which is a VStack and you see a nice multiline text constrained</p><p>by width of the parent 200 pts.</p><br /><img src="swiftui-with-uilabel-1.png "Multiline Text in SwiftUI"" alt="Multiline Text in SwiftUI"/><br /><br /><p>Now to use UILabel and produce the similar output this is what we need.</p><pre><code><span class="keyword">struct</span> SUILabel: <span class="type">UIViewRepresentable</span> {
+</code></pre><p>Because <code></code><code>Text</code><code></code> has no frame, it gets it width from the parent which is a VStack and you see a nice multiline text constrained</p><p>by width of the parent 200 pts.</p><br /><img src="swiftui-with-uilabel-1.png "Multiline Text in SwiftUI"" alt="Multiline Text in SwiftUI"/><br /><br /><p>To use UILabel and produce the similar output this is what we need.</p><pre><code><span class="keyword">struct</span> SUILabel: <span class="type">UIViewRepresentable</span> {
 
     <span class="keyword">private(set) var</span> preferredMaxLayoutWidth: <span class="type">CGFloat</span> = <span class="number">0</span>
     <span class="keyword">func</span> makeUIView(context: <span class="type">UIViewRepresentableContext</span>&lt;<span class="type">SUILabel</span>&gt;) -&gt; <span class="type">UILabel</span> {
@@ -116,7 +116,7 @@ VStack</span> {
 
     <span class="keyword">func</span> updateUIView(<span class="keyword">_</span> uiView: <span class="type">UILabel</span>, context: <span class="type">UIViewRepresentableContext</span>&lt;<span class="type">SUILabel</span>&gt;) { }
 }
-</code></pre><p>Now use SUILabel in SwiftUI view</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+</code></pre><p>Using SUILabel in SwiftUI view</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
     <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
         <span class="type">VStack</span> {
             <span class="type">GeometryReader</span> { geometry <span class="keyword">in</span>
@@ -127,17 +127,7 @@ VStack</span> {
         .<span class="call">frame</span>(width: <span class="number">200</span>)
     }
 }
-</code></pre><p>The important things to note are, the use of <a href="https://developer.apple.com/documentation/uikit/uilabel/1620534-preferredmaxlayoutwidth"><strong>preferredMaxLayoutWidth</strong></a> onUILabel,</p><p><a href="https://developer.apple.com/documentation/swiftui/geometryreader"><strong>GeometryReader</strong></a> to fed it to SUILabel and using <a href="https://developer.apple.com/documentation/swiftui/group/3284808-fixedsize"><strong>fixedSize</strong></a> on SUILabel</p><p>to force SwiftUIlayout engine to use the original size ( in UIKit words, <a href="https://developer.apple.com/documentation/uikit/uiview/1622600-intrinsiccontentsize">intrinsiccontentsize</a>)</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swift/readonly-property</guid><title>Readonly properties</title><description>Readonly properties with auto- synthesized intializers.</description><link>https://yoswift.dev/swift/readonly-property</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Readonly properties</h1><p>In a struct you can mark a property readonly like</p><pre><code><span class="keyword">struct</span> Example1 {
-    <span class="keyword">private(set) var</span> value: <span class="type">Int</span>
-}
-</code></pre><p>This is another way of marking a property readonly</p><pre><code><span class="keyword">struct</span> Example2 {
-    <span class="keyword">let</span> value: <span class="type">Int</span>
-}
-</code></pre><p>There is an important difference though, the below code will compile just fine</p><pre><code><span class="keyword">var</span> example1 = <span class="type">Example</span>(value: <span class="number">10</span>)
-example1.<span class="property">value</span> = <span class="number">20</span>
-</code></pre><p>while below code will not compile with <span style="color:red"> error: cannot assign to property: 'value' is a 'let' constant </span></p><pre><code><span class="keyword">var</span> example2 = <span class="type">Example2</span>(value: <span class="number">10</span>)
-example2.<span class="property">value</span> = <span class="number">20</span>
-</code></pre><p>and by using private(set) you can provide a default value to your property, and initializer can be called</p><p>with or without an argument.</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/keyboard-height</guid><title>Keyboard handling using combine</title><description>Reactive way to handle keyboard height change</description><link>https://yoswift.dev/combine/keyboard-height</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Keyboard handling using combine</h1><pre><code><span class="keyword">static var</span> keyboardHeightPublisher: <span class="type">AnyPublisher</span>&lt;<span class="type">CGFloat</span>, <span class="type">Never</span>&gt; {
+</code></pre><p>The important things to note are, the use of <a href="https://developer.apple.com/documentation/uikit/uilabel/1620534-preferredmaxlayoutwidth"><strong>preferredMaxLayoutWidth</strong></a> onUILabel,</p><p><a href="https://developer.apple.com/documentation/swiftui/geometryreader"><strong>GeometryReader</strong></a> to fed it to SUILabel and using <a href="https://developer.apple.com/documentation/swiftui/group/3284808-fixedsize"><strong>fixedSize</strong></a> on SUILabel</p><p>to force SwiftUIlayout engine to use the original size ( in UIKit words, <a href="https://developer.apple.com/documentation/uikit/uiview/1622600-intrinsiccontentsize">intrinsic content size</a>)</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/keyboard-height</guid><title>Keyboard handling using combine</title><description>Reactive way to handle keyboard height change</description><link>https://yoswift.dev/combine/keyboard-height</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Keyboard handling using combine</h1><pre><code><span class="keyword">static var</span> keyboardHeightPublisher: <span class="type">AnyPublisher</span>&lt;<span class="type">CGFloat</span>, <span class="type">Never</span>&gt; {
     <span class="keyword">let</span> willShow = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillShowNotification</span>)
         .<span class="call">map</span> { $0.(userInfo?[<span class="type">UIResponder</span>.<span class="property">keyboardFrameEndUserInfoKey</span>] <span class="keyword">as</span>? <span class="type">CGRect</span>)?.<span class="property">height</span> ?? <span class="number">0</span> }
 
@@ -147,7 +137,7 @@ example2.<span class="property">value</span> = <span class="number">20</span>
     <span class="keyword">return</span> <span class="type">MergeMany</span>(willShow, willHide)
         .<span class="call">eraseToAnyPublisher</span>()
 }
-</code></pre><p>Now you can subscibe easily to keyboard height changes.</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+</code></pre><p>Now you can subscribe easily to keyboard height changes.</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
     
     <span class="keyword">@State 
     private var</span> value: <span class="type">String</span>
@@ -161,4 +151,14 @@ example2.<span class="property">value</span> = <span class="number">20</span>
             }
     }
 }
-</code></pre>]]></content:encoded></item></channel></rss>
+</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swift/readonly-property</guid><title>Readonly properties</title><description>Readonly properties with auto- synthesized intializers.</description><link>https://yoswift.dev/swift/readonly-property</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Readonly properties</h1><p>In a struct you can mark a property readonly like</p><pre><code><span class="keyword">struct</span> Example1 {
+    <span class="keyword">private(set) var</span> value: <span class="type">Int</span>
+}
+</code></pre><p>This is another way of marking a property readonly</p><pre><code><span class="keyword">struct</span> Example2 {
+    <span class="keyword">let</span> value: <span class="type">Int</span>
+}
+</code></pre><p>There is an important difference though, the below code will compile just fine</p><pre><code><span class="keyword">var</span> example1 = <span class="type">Example</span>(value: <span class="number">10</span>)
+example1.<span class="property">value</span> = <span class="number">20</span>
+</code></pre><p>while below code will not compile with <span style="color:red"> error: cannot assign to property: 'value' is a 'let' constant </span></p><pre><code><span class="keyword">var</span> example2 = <span class="type">Example2</span>(value: <span class="number">10</span>)
+example2.<span class="property">value</span> = <span class="number">20</span>
+</code></pre><p>and by using private(set) you can provide a default value to your property, and initializer can be called</p><p>with or without an argument.</p>]]></content:encoded></item></channel></rss>
