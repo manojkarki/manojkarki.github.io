@@ -23,7 +23,8 @@
         statusBarStyle
     }
 }
-</code></pre><br /><p>A small router that holds the UINavigationController, and injected to view hierarchy as an environment object of root view. The only method is push taking a root view and statusBarStyle.</p><br /><pre><code>     <span class="keyword">let</span> navigationController: <span class="type">UINavigationController</span>
+</code></pre><br /><p>A small router that holds the UINavigationController, and injected to view hierarchy as an environment object of root view. The only method is push taking a root view and statusBarStyle.</p><br /><pre><code><span class="keyword">class</span> Router: <span class="type">ObservableObject</span> {
+    <span class="keyword">let</span> navigationController: <span class="type">UINavigationController</span>
     
     <span class="keyword">init</span>(navigationController: <span class="type">UINavigationController</span>) {
         <span class="keyword">self</span>.<span class="property">navigationController</span> = navigationController
