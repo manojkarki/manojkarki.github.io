@@ -281,6 +281,15 @@ footer {
   .tag-list-swiftui li, .tag {
       margin-bottom: 5px;
   }
+  .tag-list-swift li, .tag {
+      margin-bottom: 5px;
+  }
+  .tag-list-combine li, .tag {
+      margin-bottom: 5px;
+  }
+  .tag-list li, .tag {
+      margin-bottom: 5px;
+  }
 
   .content {
       margin: 20px;
@@ -314,10 +323,6 @@ footer {
   .wrapper {
       padding: 10px 5px;
       max-width: 900px;
-  }
-
-  .tag-list-swiftui li, .tag {
-      margin-bottom: 5px;
   }
 
   .content {
