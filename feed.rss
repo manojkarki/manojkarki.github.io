@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Sun, 3 May 2020 20:02:56 +0200</lastBuildDate><pubDate>Sun, 3 May 2020 20:02:56 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/swiftui/statusbar-style</guid><title>SwiftUI View and status bar style</title><description>How to change status bar style for each SwiftUI screen or View</description><link>https://yoswift.dev/swiftui/statusbar-style</link><pubDate>Sun, 3 May 2020 15:00:00 +0200</pubDate><content:encoded><![CDATA[<h1>SwiftUI View and status bar style</h1><p>In UIKit we can override preferredStatusBarStyle to change the status bar style.</p><br /><pre><code><span class="keyword">class</span> MyViewController: <span class="type">UIViewController</span> {
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Tue, 5 May 2020 10:56:03 +0200</lastBuildDate><pubDate>Tue, 5 May 2020 10:56:03 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/swiftui/swiftui-twitter-basics</guid><title>My Twitter SwiftUI collection</title><description>Some SwiftUI stuff I shared in 2019 using the beta release.</description><link>https://yoswift.dev/swiftui/swiftui-twitter-basics</link><pubDate>Tue, 5 May 2020 09:00:00 +0200</pubDate><content:encoded><![CDATA[<h1>My Twitter SwiftUI collection</h1><p>SwiftUI completly changed the way developers used to create software for Apple platforms. Here are some tips I shared in 2019 on my Twitter when SwiftUI was in beta.<br><br><br /></p><ul><li>Learn about <a href="https://twitter.com/mskarki/status/1150477598281084929" target="_blank">SequenceGesture</a> and how to use it.</li></ul><ul><li>Do you like playing cards? Here is a nice <a href="https://twitter.com/mskarki/status/1150478984037261313" target="_blank">card deck animation</a>.</li></ul><ul><li>A <a href="https://twitter.com/mskarki/status/1150479713418305536" target="_blank">flip animation</a> using ZStack. Now imagine doing it in UIKit 😀</li></ul><ul><li>Who have not seen a hamburger button, here is a <a href="https://twitter.com/mskarki/status/1151210494759489536" target="_blank">animating one</a>).</li></ul><ul><li>And the <a href="https://twitter.com/mskarki/status/1151210579010478081" target="_blank">side menu</a>.</li></ul><ul><li>This <a href="https://twitter.com/mskarki/status/1151220584921128961" target="_blank">pile of images</a>, a fun way to browse items.</li></ul><ul><li>What is <a href="https://twitter.com/mskarki/status/1151544806885199872" target="_blank">Color.red</a>, yes like almost everything it is a View in SwiftUI.</li></ul><ul><li>Do you use a UIActivityIndicatorView after seeing these <a href="https://twitter.com/mskarki/status/1151980365743034370" target="_blank">spinners</a>.</li></ul><ul><li>And finally <a href="https://twitter.com/mskarki/status/1152304358563954688" target="_blank">what are ViewModifiers and why their order is important</a>?</li></ul><br /><p>Follow me on <a href="https://twitter.com/mskarki" target="_blank">Twitter</a> for short tips like these</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swiftui/statusbar-style</guid><title>SwiftUI View and status bar style</title><description>How to change status bar style for each SwiftUI screen or View</description><link>https://yoswift.dev/swiftui/statusbar-style</link><pubDate>Sun, 3 May 2020 15:00:00 +0200</pubDate><content:encoded><![CDATA[<h1>SwiftUI View and status bar style</h1><p>In UIKit we can override preferredStatusBarStyle to change the status bar style.</p><br /><pre><code><span class="keyword">class</span> MyViewController: <span class="type">UIViewController</span> {
     <span class="keyword">override var</span> preferredStatusBarStyle: <span class="type">UIStatusBarStyle</span> {
         <span class="keyword">return</span> .<span class="dotAccess">lightContent</span>
     }
@@ -87,7 +87,41 @@ VStack</span> {
     <span class="type">ViewBuilder</span>.<span class="call">buildIf</span>(<span class="call">imageOrNil</span>(isText))
 }
 
-</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swiftui/swiftui-with-uilabel</guid><title>Using UILabel in SwiftUI</title><description>How to use a multiline UILabel in SwiftUI.</description><link>https://yoswift.dev/swiftui/swiftui-with-uilabel</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Using UILabel in SwiftUI</h1><p>But why 😀 well sometime using SwiftUI in an existing App force you to do so.</p><p>So here is a SwiftUI View using <code></code><code>Text</code><code></code></p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/keyboard-height</guid><title>Keyboard handling using combine</title><description>Reactive way to handle keyboard height change</description><link>https://yoswift.dev/combine/keyboard-height</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Keyboard handling using combine</h1><pre><code><span class="keyword">static var</span> keyboardHeightPublisher: <span class="type">AnyPublisher</span>&lt;<span class="type">CGFloat</span>, <span class="type">Never</span>&gt; {
+    <span class="keyword">let</span> willShow = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillShowNotification</span>)
+        .<span class="call">map</span> { $0.(userInfo?[<span class="type">UIResponder</span>.<span class="property">keyboardFrameEndUserInfoKey</span>] <span class="keyword">as</span>? <span class="type">CGRect</span>)?.<span class="property">height</span> ?? <span class="number">0</span> }
+
+    <span class="keyword">let</span> willHide = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillHideNotification</span>)
+        .<span class="call">map</span> { <span class="keyword">_ in</span> <span class="type">CGFloat</span>(<span class="number">0</span>) }
+
+    <span class="keyword">return</span> <span class="type">MergeMany</span>(willShow, willHide)
+        .<span class="call">eraseToAnyPublisher</span>()
+}
+</code></pre><p>Now you can subscribe easily to keyboard height changes.</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+    
+    <span class="keyword">@State 
+    private var</span> value: <span class="type">String</span>
+
+    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
+        <span class="type">TextField</span>(<span class="string">"Enter the value"</span>, text: $value)
+            .<span class="call">onReceive</span>(keyboardHeightPublisher) { keyboardHeight <span class="keyword">in
+                if</span> keyboardHeight &gt; <span class="number">0</span> {
+                    <span class="call">print</span>(<span class="string">"Move something up"</span>)
+                }
+            }
+    }
+}
+</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swift/readonly-property</guid><title>Readonly properties</title><description>Readonly properties with auto- synthesized intializers.</description><link>https://yoswift.dev/swift/readonly-property</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Readonly properties</h1><p>In a struct you can mark a property readonly like</p><pre><code><span class="keyword">struct</span> Example1 {
+    <span class="keyword">private(set) var</span> value: <span class="type">Int</span>
+}
+</code></pre><p>This is another way of marking a property readonly</p><pre><code><span class="keyword">struct</span> Example2 {
+    <span class="keyword">let</span> value: <span class="type">Int</span>
+}
+</code></pre><p>There is an important difference though, the below code will compile just fine</p><pre><code><span class="keyword">var</span> example1 = <span class="type">Example</span>(value: <span class="number">10</span>)
+example1.<span class="property">value</span> = <span class="number">20</span>
+</code></pre><p>while below code will not compile with <span style="color:red"> error: cannot assign to property: 'value' is a 'let' constant </span></p><pre><code><span class="keyword">var</span> example2 = <span class="type">Example2</span>(value: <span class="number">10</span>)
+example2.<span class="property">value</span> = <span class="number">20</span>
+</code></pre><p>and by using private(set) you can provide a default value to your property, and initializer can be called</p><p>with or without an argument.</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swiftui/swiftui-with-uilabel</guid><title>Using UILabel in SwiftUI</title><description>How to use a multiline UILabel in SwiftUI.</description><link>https://yoswift.dev/swiftui/swiftui-with-uilabel</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Using UILabel in SwiftUI</h1><p>But why 😀 well sometime using SwiftUI in an existing App force you to do so.</p><p>So here is a SwiftUI View using <code></code><code>Text</code><code></code></p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
     <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
         <span class="type">VStack</span> {
             <span class="type">Text</span>(<span class="string">"This is a SwiftUI text which is easy to use but you need to understand the SwiftUI layout engine."</span>)
@@ -127,38 +161,4 @@ VStack</span> {
         .<span class="call">frame</span>(width: <span class="number">200</span>)
     }
 }
-</code></pre><p>The important things to note are, the use of <a href="https://developer.apple.com/documentation/uikit/uilabel/1620534-preferredmaxlayoutwidth"><strong>preferredMaxLayoutWidth</strong></a> onUILabel,</p><p><a href="https://developer.apple.com/documentation/swiftui/geometryreader"><strong>GeometryReader</strong></a> to fed it to SUILabel and using <a href="https://developer.apple.com/documentation/swiftui/group/3284808-fixedsize"><strong>fixedSize</strong></a> on SUILabel</p><p>to force SwiftUIlayout engine to use the original size ( in UIKit words, <a href="https://developer.apple.com/documentation/uikit/uiview/1622600-intrinsiccontentsize">intrinsic content size</a>)</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/keyboard-height</guid><title>Keyboard handling using combine</title><description>Reactive way to handle keyboard height change</description><link>https://yoswift.dev/combine/keyboard-height</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Keyboard handling using combine</h1><pre><code><span class="keyword">static var</span> keyboardHeightPublisher: <span class="type">AnyPublisher</span>&lt;<span class="type">CGFloat</span>, <span class="type">Never</span>&gt; {
-    <span class="keyword">let</span> willShow = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillShowNotification</span>)
-        .<span class="call">map</span> { $0.(userInfo?[<span class="type">UIResponder</span>.<span class="property">keyboardFrameEndUserInfoKey</span>] <span class="keyword">as</span>? <span class="type">CGRect</span>)?.<span class="property">height</span> ?? <span class="number">0</span> }
-
-    <span class="keyword">let</span> willHide = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillHideNotification</span>)
-        .<span class="call">map</span> { <span class="keyword">_ in</span> <span class="type">CGFloat</span>(<span class="number">0</span>) }
-
-    <span class="keyword">return</span> <span class="type">MergeMany</span>(willShow, willHide)
-        .<span class="call">eraseToAnyPublisher</span>()
-}
-</code></pre><p>Now you can subscribe easily to keyboard height changes.</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
-    
-    <span class="keyword">@State 
-    private var</span> value: <span class="type">String</span>
-
-    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
-        <span class="type">TextField</span>(<span class="string">"Enter the value"</span>, text: $value)
-            .<span class="call">onReceive</span>(keyboardHeightPublisher) { keyboardHeight <span class="keyword">in
-                if</span> keyboardHeight &gt; <span class="number">0</span> {
-                    <span class="call">print</span>(<span class="string">"Move something up"</span>)
-                }
-            }
-    }
-}
-</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swift/readonly-property</guid><title>Readonly properties</title><description>Readonly properties with auto- synthesized intializers.</description><link>https://yoswift.dev/swift/readonly-property</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Readonly properties</h1><p>In a struct you can mark a property readonly like</p><pre><code><span class="keyword">struct</span> Example1 {
-    <span class="keyword">private(set) var</span> value: <span class="type">Int</span>
-}
-</code></pre><p>This is another way of marking a property readonly</p><pre><code><span class="keyword">struct</span> Example2 {
-    <span class="keyword">let</span> value: <span class="type">Int</span>
-}
-</code></pre><p>There is an important difference though, the below code will compile just fine</p><pre><code><span class="keyword">var</span> example1 = <span class="type">Example</span>(value: <span class="number">10</span>)
-example1.<span class="property">value</span> = <span class="number">20</span>
-</code></pre><p>while below code will not compile with <span style="color:red"> error: cannot assign to property: 'value' is a 'let' constant </span></p><pre><code><span class="keyword">var</span> example2 = <span class="type">Example2</span>(value: <span class="number">10</span>)
-example2.<span class="property">value</span> = <span class="number">20</span>
-</code></pre><p>and by using private(set) you can provide a default value to your property, and initializer can be called</p><p>with or without an argument.</p>]]></content:encoded></item></channel></rss>
+</code></pre><p>The important things to note are, the use of <a href="https://developer.apple.com/documentation/uikit/uilabel/1620534-preferredmaxlayoutwidth"><strong>preferredMaxLayoutWidth</strong></a> onUILabel, <a href="https://developer.apple.com/documentation/swiftui/geometryreader"><strong>GeometryReader</strong></a> to fed it to SUILabel and using <a href="https://developer.apple.com/documentation/swiftui/group/3284808-fixedsize"><strong>fixedSize</strong></a> on SUILabel to force SwiftUIlayout engine to use the original size ( in UIKit words, <a href="https://developer.apple.com/documentation/uikit/uiview/1622600-intrinsiccontentsize">intrinsic content size</a>)</p>]]></content:encoded></item></channel></rss>
