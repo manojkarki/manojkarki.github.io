@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="og:site_name" content="YoSwift!"/><link rel="canonical" href="https://yoswift.dev/swift/Tree%20in%20Swift"/><meta name="twitter:url" content="https://yoswift.dev/swift/Tree%20in%20Swift"/><meta name="og:url" content="https://yoswift.dev/swift/Tree%20in%20Swift"/><title>Tree in Swift | YoSwift!</title><meta name="twitter:title" content="Tree in Swift | YoSwift!"/><meta name="og:title" content="Tree in Swift | YoSwift!"/><meta name="description" content="How to represent Tree data structure in Swift"/><meta name="twitter:description" content="How to represent Tree data structure in Swift"/><meta name="og:description" content="How to represent Tree data structure in Swift"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to YoSwift!"/><meta name="twitter:image" content="https://yoswift.dev/images/logo.png"/><meta name="og:image" content="https://yoswift.dev/images/logo.png"/></head><body class="item-page"><header><a id="logo" href="/"><img src="/images/logo.png" alt="Yo! Swift"/></a><nav id="main-navigation"><ul><li><a href="/swiftui">SwiftUI</a></li><li><a class="selected" href="/swift">Swift</a></li><li><a href="/combine">Combine</a></li><li><a href="/about">About</a></li></ul></nav></header><div class="wrapper"><article><div class="content"><h1>Tree in Swift</h1><p>Tree data structure is something I am sure every programmer has implemented at least once (though more for interviews than in job 😁). Nevertheless let's see how to represent a binary tree in Swift.</p><p>A <strong>binary tree</strong> is a specific for of tree data structure where each node has at most two children which are referred to as the <em>left child</em> and the <em>right child</em>. [<a href="https://en.wikipedia.org/wiki/Binary_tree">Ref</a>]</p><p>You probably figured out from the definition that left and right children are itself Trees, so let's start with a class which is a Ref type (with a value type like structure we cannot represent a Tree, which means an infinite size memory)</p><pre><code><span class="keyword">class</span> TreeClass&lt;T&gt; {
+    <span class="keyword">var</span> data: <span class="type">T</span>
+    <span class="keyword">var</span> left: <span class="type">TreeClass</span>&lt;<span class="type">T</span>&gt;?
+    <span class="keyword">var</span> right: <span class="type">TreeClass</span>&lt;<span class="type">T</span>&gt;?
+
+    <span class="keyword">init</span>(data: <span class="type">T</span>, left: <span class="type">TreeClass</span>&lt;<span class="type">T</span>&gt;?, right: <span class="type">TreeClass</span>&lt;<span class="type">T</span>&gt;?) {
+        <span class="keyword">self</span>.<span class="property">data</span> = data
+        <span class="keyword">self</span>.<span class="property">left</span> = left
+        <span class="keyword">self</span>.<span class="property">right</span> = right
+    }
+}
+</code></pre><p>Now represent a tree with root (3) left child (1) and right child (2)</p><pre><code><span class="keyword">let</span> tree11 = <span class="type">TreeC</span>(data: <span class="number">1</span>, left: <span class="keyword">nil</span>, right: <span class="keyword">nil</span>)
+<span class="keyword">let</span> tree22 = <span class="type">TreeC</span>(data: <span class="number">2</span>, left: <span class="keyword">nil</span>, right: <span class="keyword">nil</span>)
+<span class="keyword">let</span> tree33 = <span class="type">TreeC</span>(data: <span class="number">3</span>, left: tree11, right: tree22)
+</code></pre><p>Let's write a <a href="https://en.wikipedia.org/wiki/Tree_traversal">preorder traversal</a> algorithm</p><pre><code><span class="keyword">func</span> preorder&lt;T&gt;(tree: <span class="type">TreeC</span>&lt;<span class="type">T</span>&gt;?) {
+    <span class="keyword">guard let</span> t = tree <span class="keyword">else</span> {
+        <span class="keyword">return</span>
+    }
+    <span class="call">print</span>(t.<span class="property">data</span>)
+    <span class="call">preorder</span>(tree: t.<span class="property">left</span>)
+    <span class="call">preorder</span>(tree: t.<span class="property">right</span>)
+}
+</code></pre><p>In Swift there is another (better) way to represent recursive data structures like Tree and that is called <em>Indirect enum</em></p><p>With it an enum case can refer to itself which essentially is possible as compiler internally make it like a reference type. (for normal enums which are value type, internally compiler treat them as C unions )</p><pre><code><span class="keyword">indirect enum</span> Tree&lt;T&gt; {
+  <span class="keyword">case</span> <span class="type">Nil</span>
+  <span class="keyword">case</span> <span class="type">Node</span>(value: <span class="type">T</span> ,left: <span class="type">Tree</span>&lt;<span class="type">T</span>&gt; ,right: <span class="type">Tree</span>&lt;<span class="type">T</span>&gt;)
+}
+</code></pre><p>Much better, right?</p><p>Same tree representation</p><pre><code><span class="keyword">let</span> tree1 = <span class="type">Tree</span>.<span class="type">Node</span>(value: <span class="number">1</span>, left: <span class="type">Tree</span>.<span class="type">Nil</span>, right: <span class="type">Tree</span>.<span class="type">Nil</span>)
+<span class="keyword">let</span> tree2 = <span class="type">Tree</span>.<span class="type">Node</span>(value: <span class="number">2</span>, left: <span class="type">Tree</span>.<span class="type">Nil</span>, right: <span class="type">Tree</span>.<span class="type">Nil</span>)
+<span class="keyword">let</span> tree3 = <span class="type">Tree</span>.<span class="type">Node</span>(value: <span class="number">3</span>, left: tree1, right: tree2)
+</code></pre><p>And preorder algorithm</p><pre><code><span class="keyword">func</span> preorder&lt;T&gt;(tree:<span class="type">Tree</span>&lt;<span class="type">T</span>&gt;) {
+    <span class="keyword">switch</span> tree {
+    <span class="keyword">case</span> .<span class="dotAccess">Nil</span>:
+        <span class="keyword">break</span>;
+    <span class="keyword">case</span> .<span class="dotAccess">Node</span>(<span class="keyword">let</span> value, <span class="keyword">let</span> left, <span class="keyword">let</span> right):
+        <span class="call">print</span>(value)
+        <span class="call">preorder</span>(tree: left)
+        <span class="call">preorder</span>(tree: right)
+    }
+}
+</code></pre><p>Swift is evolving very fast and has so many features that sometime we miss to use the best feature available for a given problem.</p></div><span>Tagged with: </span><br/><ul class="tag-list-swift"><li><a href="/tags/swift">swift</a></li><li><a href="/tags/tree">tree</a></li><li><a href="/tags/indirect-enum">indirect enum</a></li><li><a href="/tags/preorder">preorder</a></li><li><a href="/tags/algorithm">algorithm</a></li></ul></article></div><footer><p>Coded in Swift, generated using <a href="https://github.com/johnsundell/publish">Publish</a></p><p><a href="/feed.rss">RSS feed</a></p></footer></body></html>
