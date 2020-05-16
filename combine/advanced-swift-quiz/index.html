@@ -26,7 +26,14 @@ p4.<span class="call">sink</span> { <span class="call">print</span>($0) } <span 
 
 <span class="keyword">let</span> p44: <span class="type">Just</span>&lt;<span class="type">Int</span>&gt; = <span class="call">genericTest</span>() <span class="comment">// line 10</span>
 p44.<span class="call">sink</span> { <span class="call">print</span>($0) } <span class="comment">// line 11</span>
-</code></pre><p>Write down all the correct statements</p><ol><li>The method <code>genericTest</code> has syntax error</li><li><code>Just(9) as! T</code> the cast is not required</li><li><code>where T.Output == Int, T.Failure == Never</code> is incorrect syntax.</li><li>The <strong>Line 8</strong> has syntax error</li><li>The <strong>Line 10</strong> has syntax error</li><li>The <strong>Line 10</strong> is correct but <strong>line 11</strong> has syntax error</li><li>We can call <code>someTest</code> of Q3 and <code>genericTest</code> interchangeably.</li></ol><hr><hr><h2>Check your Score</h2><details>
+</code></pre><p>Write down all the correct statements</p><ol><li>The method <code>genericTest</code> has syntax error</li><li><code>Just(9) as! T</code> the cast is not required</li><li><code>where T.Output == Int, T.Failure == Never</code> is incorrect syntax.</li><li>The <strong>Line 8</strong> has syntax error</li><li>The <strong>Line 10</strong> has syntax error</li><li>The <strong>Line 10</strong> is correct but <strong>line 11</strong> has syntax error</li><li>We can call <code>someTest</code> of Q3 and <code>genericTest</code> interchangeably.</li></ol><br>
+<br>
+
+------
+## Check your Score
+------
+
+<details>
   <summary>Answer 1</summary>
   <br>
   <input type="checkbox" name="q1" value="q1" checked disabled>
@@ -36,7 +43,8 @@ p44.<span class="call">sink</span> { <span class="call">print</span>($0) } <span
     <li>Publisher is a protocol with associatedtype (Output and Failure) so it cannot be used a a type.</li>
     <li><a href="https://docs.swift.org/swift-book/LanguageGuide/Generics.html">Read about protocols with Associated types</a></li>
   </ul>  
-</details><br><br>
+</details>
+<br><br>
 
 <details>
   <summary>Answer 2</summary>
