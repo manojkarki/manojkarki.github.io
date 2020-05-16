@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="og:site_name" content="YoSwift!"/><link rel="canonical" href="https://yoswift.dev/combine/advanced-swift-quiz"/><meta name="twitter:url" content="https://yoswift.dev/combine/advanced-swift-quiz"/><meta name="og:url" content="https://yoswift.dev/combine/advanced-swift-quiz"/><title>Advanced Swift Quiz | YoSwift!</title><meta name="twitter:title" content="Advanced Swift Quiz | YoSwift!"/><meta name="og:title" content="Advanced Swift Quiz | YoSwift!"/><meta name="description" content="Test your advanced Swift skills using Combine"/><meta name="twitter:description" content="Test your advanced Swift skills using Combine"/><meta name="og:description" content="Test your advanced Swift skills using Combine"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to YoSwift!"/><meta name="twitter:image" content="https://yoswift.dev/images/logo.png"/><meta name="og:image" content="https://yoswift.dev/images/logo.png"/></head><body class="item-page"><header><a id="logo" href="/"><img src="/images/logo.png" alt="Yo! Swift"/></a><nav id="main-navigation"><ul><li><a href="/swiftui">SwiftUI</a></li><li><a href="/swift">Swift</a></li><li><a class="selected" href="/combine">Combine</a></li><li><a href="/about">About</a></li></ul></nav></header><div class="wrapper"><article><div class="content"><h1>Advanced Swift Quiz</h1><p>There are some Swift concepts which often surprise or confuse even very experienced programmers. Let's find out how good you are in understanding some of the advanced Swift skills by answering the quiz below using Combine.</p><p>Before starting if you want, take some time to read about <a href="https://developer.apple.com/documentation/combine/publisher">Publisher</a> and <a href="https://developer.apple.com/documentation/combine/just">Just</a> which are used in all problems you are about to see.</p><p>Now open a notebook to write down your answers and check in the end how many points you got and do not cheat 🤓</p><h2>Question 1</h2><pre><code><span class="comment">//Method 1</span>
+<span class="keyword">func</span> patTtest() -&gt; <span class="type">Publisher</span> {
+    <span class="type">Just</span>(<span class="number">9</span>)
+}
+</code></pre><p>Write down <strong>all</strong> the correct statements</p><ol><li>The code has "<em>missing return</em>" syntax error</li><li>The code has syntax error but not "<em>missing return</em>"</li><li>The code has no syntax error</li></ol><hr><h2>Question 2</h2><pre><code><span class="comment">//Method 2</span>
+<span class="keyword">func</span> anyTest() -&gt; <span class="type">AnyPublisher</span>&lt;<span class="type">Int</span>, <span class="type">Never</span>&gt; {
+    <span class="type">Just</span>(<span class="number">9</span>).<span class="call">eraseToAnyPublisher</span>()
+}
+<span class="keyword">let</span> p2 = <span class="call">anyTest</span>() <span class="comment">//line 1</span> 
+p2.<span class="call">sink</span> { <span class="call">print</span>($0) } <span class="comment">//line 2</span>
+<span class="keyword">let</span> p22: <span class="type">Just</span>&lt;<span class="type">Int</span>&gt; = <span class="call">anyTest</span>() <span class="comment">//line 3</span>
+p22.<span class="call">sink</span> { <span class="call">print</span>($0) } <span class="comment">//line 4</span>
+</code></pre><p>Write down <strong>all</strong> the correct statements</p><ol><li>The <strong>Line 1</strong> has syntax error</li><li>The <strong>Line 2</strong> has syntax error</li><li>The <strong>Line 3</strong> has syntax error</li><li>The method <code>anyTest</code> has syntax error</li><li><code>eraseToAnyPublisher</code> in method <code>anyTest</code> is not required.</li></ol><hr><h2>Question 3</h2><pre><code><span class="comment">//Method 3</span>
+<span class="keyword">func</span> someTest() -&gt; <span class="keyword">some</span> <span class="type">Publisher</span> {
+    <span class="type">Just</span>(<span class="number">9</span>)
+}
+<span class="keyword">let</span> p3 = <span class="call">someTest</span>() <span class="comment">//line 5</span>
+p3.<span class="call">sink</span> { <span class="call">print</span>($0) } <span class="comment">//line 6</span>
+<span class="keyword">let</span> p33: <span class="type">Just</span>&lt;<span class="type">Int</span>&gt; = <span class="call">someTest</span>() <span class="comment">//line 7</span>
+</code></pre><p>Write down all the correct statements</p><ol><li>The method <code>someTest</code> has syntax error</li><li>Just can be a return type <code>some Publisher</code></li><li>The <strong>Line 5</strong> has syntax error</li><li>The <strong>Line 6</strong> has syntax error</li><li>The <strong>Line 7</strong> has syntax error</li><li>We can call <code>anyTest</code> of Q2 and <code>someTest</code> interchangeably.</li></ol><hr><h2>Question 4</h2><pre><code><span class="comment">//Method 4</span>
+<span class="keyword">func</span> genericTest&lt;T: <span class="type">Publisher</span>&gt;() -&gt; <span class="type">T</span> <span class="keyword">where</span> <span class="type">T</span>.<span class="type">Output</span> == <span class="type">Int</span>, <span class="type">T</span>.<span class="type">Failure</span> == <span class="type">Never</span> {
+    <span class="type">Just</span>(<span class="number">9</span>) <span class="keyword">as</span>! <span class="type">T</span>
+}
+<span class="keyword">let</span> p4 = <span class="call">genericTest</span>() <span class="comment">// line 8</span>
+p4.<span class="call">sink</span> { <span class="call">print</span>($0) } <span class="comment">// line 9</span>
+
+<span class="keyword">let</span> p44: <span class="type">Just</span>&lt;<span class="type">Int</span>&gt; = <span class="call">genericTest</span>() <span class="comment">// line 10</span>
+p44.<span class="call">sink</span> { <span class="call">print</span>($0) } <span class="comment">// line 11</span>
+</code></pre><p>Write down all the correct statements</p><ol><li>The method <code>genericTest</code> has syntax error</li><li><code>Just(9) as! T</code> the cast is not required</li><li><code>where T.Output == Int, T.Failure == Never</code> is incorrect syntax.</li><li>The <strong>Line 8</strong> has syntax error</li><li>The <strong>Line 10</strong> has syntax error</li><li>The <strong>Line 10</strong> is correct but <strong>line 11</strong> has syntax error</li><li>We can call <code>someTest</code> of Q3 and <code>genericTest</code> interchangeably.</li></ol><h2>Check your Score</h2><details>
+  <summary>Answer 1</summary>
+  <br>
+  <input type="checkbox" name="q1" value="q1" checked disabled>
+  <label for="q1"> Only option 2 is correct</label>
+  <h3>Hints</h3>
+  <ul>
+    <li>Publisher is a protocol with associatedtype (Output and Failure) so it cannot be used a a type.</li>
+    <li><a href="https://docs.swift.org/swift-book/LanguageGuide/Generics.html">Read about protocols with Associated types</a></li>
+  </ul>  
+</details><br><br>
+
+<details>
+  <summary>Answer 2</summary>
+  <br>
+  <input type="checkbox" name="q2" value="q2" checked disabled>
+  <label for="q2"> Only option 3 is correct.</label>
+  <h3>Hints</h3>
+  <ul>
+    <li>The type of p22,  'Just&lt;Int&gt;' is not same as return type of method 'AnyPublisher&lt;Int, Never&gt;'</li>
+    <li><a href="https://developer.apple.com/documentation/combine/anypublisher">Read about Publisher type</a></li>
+    <li><a href="https://www.swiftbysundell.com/articles/different-flavors-of-type-erasure-in-swift/">Read about Any[Type] concept</a></li>
+  </ul>
+</details>
+
+<br><br>
+
+<details>
+  <summary>Answer 3</summary>
+  <br>
+  <input type="checkbox" name="q3" value="q3" checked disabled>
+  <label for="q3"> Option 4 and Option 5 are correct.</label>
+  <h3>Hints</h3>
+  <ul>
+    <li>Check the type requirements for a subscriber to subscribe to a Publisher. The subscriber’s Input and Failure associated types must match the Output and Failure types declared by the publisher.</li>
+    <li>'some Publisher' is not same as 'Just<Int>'</li>
+    <li><a href="https://stackoverflow.com/questions/56433665/what-is-the-some-keyword-in-swiftui">Check out various answers in this SO post</a></li>
+    <li><a href="https://github.com/apple/swift-evolution/blob/master/proposals/0244-opaque-result-types.md">Proposal about opaque return types</a></li>
+  </ul>
+  </details>
+
+<br><br>
+
+<details>
+  <summary>Answer 4</summary>
+  <br>
+  <input type="checkbox" name="q4" value="q4" checked disabled>
+  <label for="q4"> Only option 4 is correct.</label>
+  <h3>Hints</h3>
+  <ul>
+    <li>Compiler cannot infer the Generic parameter 'T' unless you explicitly declare type of p4.</li>
+    <li><a href="https://docs.swift.org/swift-book/LanguageGuide/Generics.html">Read about Generics</a></li>    
+  </ul>
+</details>
+
+<br>
+<h2>Reward you 25 points for each correct answer.</h2>
+<h3>Don't be shy and <a href="https://twitter.com/intent/tweet?via=mskarki&amp;text=Yo!, my score in advanced Swift quiz is [ ]&amp;url=https%3A//yoswift.dev/combine/advanced-swift-quiz" rel="nofollow">share your score</h3></a>
+
+</div><span>Tagged with: </span><br/><ul class="tag-list-combine"><li><a href="/tags/combine">combine</a></li><li><a href="/tags/some">some</a></li><li><a href="/tags/quiz">quiz</a></li></ul></article></div><footer><p>Coded in Swift, generated using <a href="https://github.com/johnsundell/publish">Publish</a></p><p><a href="/feed.rss">RSS feed</a></p></footer></body></html>
