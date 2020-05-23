@@ -1,4 +1,37 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Sat, 16 May 2020 12:32:31 +0200</lastBuildDate><pubDate>Sat, 16 May 2020 12:32:31 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/combine/advanced-swift-quiz</guid><title>Advanced Swift Quiz</title><description>Test your advanced Swift skills using Combine</description><link>https://yoswift.dev/combine/advanced-swift-quiz</link><pubDate>Sat, 16 May 2020 10:30:00 +0200</pubDate><content:encoded><![CDATA[<h1>Advanced Swift Quiz</h1><p>There are some Swift concepts which often surprise or confuse even very experienced programmers. Let's find out how good you are in understanding some of the advanced Swift skills by answering the quiz below using Combine.</p><p>Before starting if you want, take some time to read about <a href="https://developer.apple.com/documentation/combine/publisher">Publisher</a> and <a href="https://developer.apple.com/documentation/combine/just">Just</a> which are used in all problems you are about to see.</p><p>Now open a notebook to write down your answers and check in the end how many points you got and do not cheat 🤓</p><h2>Question 1</h2><pre><code><span class="comment">//Method 1</span>
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Sat, 23 May 2020 15:13:36 +0200</lastBuildDate><pubDate>Sat, 23 May 2020 15:13:36 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/combine/parallel-download-using-combine</guid><title>Multiple simultaneous network requests</title><description>Download multiple images using Combine</description><link>https://yoswift.dev/combine/parallel-download-using-combine</link><pubDate>Sat, 23 May 2020 01:25:00 +0200</pubDate><content:encoded><![CDATA[<h1>Multiple simultaneous network requests</h1><p>Today we will learn how to "combine" multiple publishers to create a new one. This has many use cases for example it can be used to download multiple images in parallel combining an existing Publisher which downloads an image from internet .</p><p>The sample App we will use to understand it, is a GridView of images where we want to download all images simultaneously before rendering</p><br /><img src="parallel-download-using-combine.gif "GridView"" alt="GridView"/><br /><br /><p>Let's set the stage first, we already have a method called <strong>fetchImage</strong> using <strong>URLSession's dataTaskPublisher</strong> to download an image from Internet. I am using this awesome site called <a href="https://picsum.photos/">Picsum Photos</a> to download a random picture from web of given size (in our example it is 80x80 points).</p><br /><pre><code><span class="keyword">private func</span> fetchImage() -&gt; <span class="type">AnyPublisher</span>&lt;<span class="type">Image</span>, <span class="type">Never</span>&gt; {
+        <span class="keyword">let</span> url = <span class="type">URL</span>(string: <span class="string">"https://picsum.photos/80"</span>)!
+        <span class="keyword">return</span> <span class="type">URLSession</span>.<span class="property">shared</span>.<span class="call">dataTaskPublisher</span>(for: url)
+            .<span class="call">map</span> {
+                <span class="keyword">guard let</span> uiImage = <span class="type">UIImage</span>(data: $0.<span class="property">data</span>) <span class="keyword">else</span> {
+                    <span class="keyword">return</span> <span class="type">Image</span>.<span class="property">default</span>
+                }
+                <span class="keyword">return</span> <span class="type">Image</span>(uiImage: uiImage)
+        }
+        .<span class="call">replaceError</span>(with: <span class="type">Image</span>.<span class="property">default</span>)
+        .<span class="call">eraseToAnyPublisher</span>()
+    }
+<span class="keyword">extension</span> <span class="type">Image</span> {
+    <span class="keyword">static var</span> `default` = <span class="type">Image</span>(systemName: <span class="string">"photo"</span>)
+}
+</code></pre><br /><p>Given this method, let's see how we can leverage this to achieve downloading multiple images in parallel. So without any delay let's see the code. All steps in the code are commented to explain what is going on.</p><br /><pre><code><span class="comment">// Download n images</span>
+<span class="keyword">func</span> fetch(n: <span class="type">Int</span>) {
+    <span class="comment">//Make an array of publishers</span> 
+    <span class="keyword">let</span> arrayOfPublishers = (<span class="number">0</span>...n).<span class="call">map</span> { <span class="keyword">_ in</span>
+        <span class="call">fetchImage</span>()
+    }
+    <span class="comment">//Create a publisher of a sequence</span>
+    <span class="type">Publishers</span>.<span class="type">Sequence</span>(sequence: arrayOfPublishers)
+        .<span class="dotAccess">flatMap</span>{ $0 } <span class="comment">//merges the output from all returned publishers into a single stream of Image.
+  										//AnyPublisher&lt;Image, Never&gt; to Image</span>
+        .<span class="call">collect</span>() <span class="comment">//collects all received items and returns them as an array upon completion.
+                   //this is what collects all images and finishes when all are available</span> 
+        .<span class="call">receive</span>(on: <span class="type">RunLoop</span>.<span class="property">main</span>) <span class="comment">// receive on main thread so that we can update our UI with images</span>
+        .<span class="call">sink</span> { <span class="comment">//create a subscription, here the value we will receive is going to be [Image] 
+            //we have all images $0, downloaded now</span> 
+        }
+        .<span class="call">store</span>(in: &amp;cancellableSet) <span class="comment">//so that we retain subscription</span>
+}
+</code></pre><p>The full code is available in this <a href="https://gist.github.com/manojkarki/75869a2bd7df5845f8d4c4fe70493a5d">Github gist</a></p><br /><p>If you have any questions, doubts or feedback <a href="https://yoswift.dev/about/about/">get in touch</a> and I would be happy to help.</p><br /><a href="https://twitter.com/intent/tweet?via=mskarki&amp;text=Download multiple images using Combine&amp;url=https%3A//yoswift.dev/combine/parallel-download-using-combine" rel="nofollow">Tweet this article</a>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/advanced-swift-quiz</guid><title>Advanced Swift Quiz</title><description>Test your advanced Swift skills using Combine</description><link>https://yoswift.dev/combine/advanced-swift-quiz</link><pubDate>Sat, 16 May 2020 10:30:00 +0200</pubDate><content:encoded><![CDATA[<h1>Advanced Swift Quiz</h1><p>There are some Swift concepts which often surprise or confuse even very experienced programmers. Let's find out how good you are in understanding some of the advanced Swift skills by answering the quiz below using Combine.</p><p>Before starting if you want, take some time to read about <a href="https://developer.apple.com/documentation/combine/publisher">Publisher</a> and <a href="https://developer.apple.com/documentation/combine/just">Just</a> which are used in all problems you are about to see.</p><p>Now open a notebook to write down your answers and check in the end how many points you got and do not cheat 🤓</p><h2>Question 1</h2><pre><code><span class="comment">//Method 1</span>
 <span class="keyword">func</span> patTtest() -&gt; <span class="type">Publisher</span> {
     <span class="type">Just</span>(<span class="number">9</span>)
 }
@@ -64,6 +97,7 @@ p44.<span class="call">sink</span> { <span class="call">print</span>($0) } <span
     <li>'some Publisher' is not same as 'Just<Int>'</li>
     <li><a href="https://stackoverflow.com/questions/56433665/what-is-the-some-keyword-in-swiftui">Check out various answers in this SO post</a></li>
     <li><a href="https://github.com/apple/swift-evolution/blob/master/proposals/0244-opaque-result-types.md">Proposal about opaque return types</a></li>
+    <li><a href="https://www.donnywals.com/understanding-type-erasure-in-swift/">Donny Wals explaining "some" concepts here</a></li>    
   </ul>
   </details>
 
@@ -213,31 +247,17 @@ VStack</span> {
     <span class="type">ViewBuilder</span>.<span class="call">buildIf</span>(<span class="call">imageOrNil</span>(isText))
 }
 
-</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/keyboard-height</guid><title>Keyboard handling using combine</title><description>Reactive way to handle keyboard height change</description><link>https://yoswift.dev/combine/keyboard-height</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Keyboard handling using combine</h1><pre><code><span class="keyword">static var</span> keyboardHeightPublisher: <span class="type">AnyPublisher</span>&lt;<span class="type">CGFloat</span>, <span class="type">Never</span>&gt; {
-    <span class="keyword">let</span> willShow = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillShowNotification</span>)
-        .<span class="call">map</span> { $0.(userInfo?[<span class="type">UIResponder</span>.<span class="property">keyboardFrameEndUserInfoKey</span>] <span class="keyword">as</span>? <span class="type">CGRect</span>)?.<span class="property">height</span> ?? <span class="number">0</span> }
-
-    <span class="keyword">let</span> willHide = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillHideNotification</span>)
-        .<span class="call">map</span> { <span class="keyword">_ in</span> <span class="type">CGFloat</span>(<span class="number">0</span>) }
-
-    <span class="keyword">return</span> <span class="type">MergeMany</span>(willShow, willHide)
-        .<span class="call">eraseToAnyPublisher</span>()
+</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swift/readonly-property</guid><title>Readonly properties</title><description>Readonly properties with auto- synthesized intializers.</description><link>https://yoswift.dev/swift/readonly-property</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Readonly properties</h1><p>In a struct you can mark a property readonly like</p><pre><code><span class="keyword">struct</span> Example1 {
+    <span class="keyword">private(set) var</span> value: <span class="type">Int</span>
 }
-</code></pre><p>Now you can subscribe easily to keyboard height changes.</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
-    
-    <span class="keyword">@State 
-    private var</span> value: <span class="type">String</span>
-
-    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
-        <span class="type">TextField</span>(<span class="string">"Enter the value"</span>, text: $value)
-            .<span class="call">onReceive</span>(keyboardHeightPublisher) { keyboardHeight <span class="keyword">in
-                if</span> keyboardHeight &gt; <span class="number">0</span> {
-                    <span class="call">print</span>(<span class="string">"Move something up"</span>)
-                }
-            }
-    }
+</code></pre><p>This is another way of marking a property readonly</p><pre><code><span class="keyword">struct</span> Example2 {
+    <span class="keyword">let</span> value: <span class="type">Int</span>
 }
-</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swiftui/swiftui-with-uilabel</guid><title>Using UILabel in SwiftUI</title><description>How to use a multiline UILabel in SwiftUI.</description><link>https://yoswift.dev/swiftui/swiftui-with-uilabel</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Using UILabel in SwiftUI</h1><p>But why 😀 well sometime using SwiftUI in an existing App force you to do so.</p><p>So here is a SwiftUI View using <code></code><code>Text</code><code></code></p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+</code></pre><p>There is an important difference though, the below code will compile just fine</p><pre><code><span class="keyword">var</span> example1 = <span class="type">Example</span>(value: <span class="number">10</span>)
+example1.<span class="property">value</span> = <span class="number">20</span>
+</code></pre><p>while below code will not compile with <span style="color:red"> error: cannot assign to property: 'value' is a 'let' constant </span></p><pre><code><span class="keyword">var</span> example2 = <span class="type">Example2</span>(value: <span class="number">10</span>)
+example2.<span class="property">value</span> = <span class="number">20</span>
+</code></pre><p>and by using private(set) you can provide a default value to your property, and initializer can be called</p><p>with or without an argument.</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swiftui/swiftui-with-uilabel</guid><title>Using UILabel in SwiftUI</title><description>How to use a multiline UILabel in SwiftUI.</description><link>https://yoswift.dev/swiftui/swiftui-with-uilabel</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Using UILabel in SwiftUI</h1><p>But why 😀 well sometime using SwiftUI in an existing App force you to do so.</p><p>So here is a SwiftUI View using <code></code><code>Text</code><code></code></p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
     <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
         <span class="type">VStack</span> {
             <span class="type">Text</span>(<span class="string">"This is a SwiftUI text which is easy to use but you need to understand the SwiftUI layout engine."</span>)
@@ -277,14 +297,28 @@ VStack</span> {
         .<span class="call">frame</span>(width: <span class="number">200</span>)
     }
 }
-</code></pre><p>The important things to note are, the use of <a href="https://developer.apple.com/documentation/uikit/uilabel/1620534-preferredmaxlayoutwidth"><strong>preferredMaxLayoutWidth</strong></a> onUILabel, <a href="https://developer.apple.com/documentation/swiftui/geometryreader"><strong>GeometryReader</strong></a> to fed it to SUILabel and using <a href="https://developer.apple.com/documentation/swiftui/group/3284808-fixedsize"><strong>fixedSize</strong></a> on SUILabel to force SwiftUIlayout engine to use the original size ( in UIKit words, <a href="https://developer.apple.com/documentation/uikit/uiview/1622600-intrinsiccontentsize">intrinsic content size</a>)</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swift/readonly-property</guid><title>Readonly properties</title><description>Readonly properties with auto- synthesized intializers.</description><link>https://yoswift.dev/swift/readonly-property</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Readonly properties</h1><p>In a struct you can mark a property readonly like</p><pre><code><span class="keyword">struct</span> Example1 {
-    <span class="keyword">private(set) var</span> value: <span class="type">Int</span>
+</code></pre><p>The important things to note are, the use of <a href="https://developer.apple.com/documentation/uikit/uilabel/1620534-preferredmaxlayoutwidth"><strong>preferredMaxLayoutWidth</strong></a> onUILabel, <a href="https://developer.apple.com/documentation/swiftui/geometryreader"><strong>GeometryReader</strong></a> to fed it to SUILabel and using <a href="https://developer.apple.com/documentation/swiftui/group/3284808-fixedsize"><strong>fixedSize</strong></a> on SUILabel to force SwiftUIlayout engine to use the original size ( in UIKit words, <a href="https://developer.apple.com/documentation/uikit/uiview/1622600-intrinsiccontentsize">intrinsic content size</a>)</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/keyboard-height</guid><title>Keyboard handling using combine</title><description>Reactive way to handle keyboard height change</description><link>https://yoswift.dev/combine/keyboard-height</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Keyboard handling using combine</h1><pre><code><span class="keyword">static var</span> keyboardHeightPublisher: <span class="type">AnyPublisher</span>&lt;<span class="type">CGFloat</span>, <span class="type">Never</span>&gt; {
+    <span class="keyword">let</span> willShow = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillShowNotification</span>)
+        .<span class="call">map</span> { $0.(userInfo?[<span class="type">UIResponder</span>.<span class="property">keyboardFrameEndUserInfoKey</span>] <span class="keyword">as</span>? <span class="type">CGRect</span>)?.<span class="property">height</span> ?? <span class="number">0</span> }
+
+    <span class="keyword">let</span> willHide = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillHideNotification</span>)
+        .<span class="call">map</span> { <span class="keyword">_ in</span> <span class="type">CGFloat</span>(<span class="number">0</span>) }
+
+    <span class="keyword">return</span> <span class="type">MergeMany</span>(willShow, willHide)
+        .<span class="call">eraseToAnyPublisher</span>()
 }
-</code></pre><p>This is another way of marking a property readonly</p><pre><code><span class="keyword">struct</span> Example2 {
-    <span class="keyword">let</span> value: <span class="type">Int</span>
+</code></pre><p>Now you can subscribe easily to keyboard height changes.</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+    
+    <span class="keyword">@State 
+    private var</span> value: <span class="type">String</span>
+
+    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
+        <span class="type">TextField</span>(<span class="string">"Enter the value"</span>, text: $value)
+            .<span class="call">onReceive</span>(keyboardHeightPublisher) { keyboardHeight <span class="keyword">in
+                if</span> keyboardHeight &gt; <span class="number">0</span> {
+                    <span class="call">print</span>(<span class="string">"Move something up"</span>)
+                }
+            }
+    }
 }
-</code></pre><p>There is an important difference though, the below code will compile just fine</p><pre><code><span class="keyword">var</span> example1 = <span class="type">Example</span>(value: <span class="number">10</span>)
-example1.<span class="property">value</span> = <span class="number">20</span>
-</code></pre><p>while below code will not compile with <span style="color:red"> error: cannot assign to property: 'value' is a 'let' constant </span></p><pre><code><span class="keyword">var</span> example2 = <span class="type">Example2</span>(value: <span class="number">10</span>)
-example2.<span class="property">value</span> = <span class="number">20</span>
-</code></pre><p>and by using private(set) you can provide a default value to your property, and initializer can be called</p><p>with or without an argument.</p>]]></content:encoded></item></channel></rss>
+</code></pre>]]></content:encoded></item></channel></rss>

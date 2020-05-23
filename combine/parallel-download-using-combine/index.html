@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="og:site_name" content="YoSwift!"/><link rel="canonical" href="https://yoswift.dev/combine/parallel-download-using-combine"/><meta name="twitter:url" content="https://yoswift.dev/combine/parallel-download-using-combine"/><meta name="og:url" content="https://yoswift.dev/combine/parallel-download-using-combine"/><title>Multiple simultaneous network requests | YoSwift!</title><meta name="twitter:title" content="Multiple simultaneous network requests | YoSwift!"/><meta name="og:title" content="Multiple simultaneous network requests | YoSwift!"/><meta name="description" content="Download multiple images using Combine"/><meta name="twitter:description" content="Download multiple images using Combine"/><meta name="og:description" content="Download multiple images using Combine"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to YoSwift!"/><meta name="twitter:image" content="https://yoswift.dev/images/logo.png"/><meta name="og:image" content="https://yoswift.dev/images/logo.png"/></head><body class="item-page"><header><a id="logo" href="/"><img src="/images/logo.png" alt="Yo! Swift"/></a><nav id="main-navigation"><ul><li><a href="/swiftui">SwiftUI</a></li><li><a href="/swift">Swift</a></li><li><a class="selected" href="/combine">Combine</a></li><li><a href="/about">About</a></li></ul></nav></header><div class="wrapper"><article><div class="content"><h1>Multiple simultaneous network requests</h1><p>Today we will learn how to "combine" multiple publishers to create a new one. This has many use cases for example it can be used to download multiple images in parallel combining an existing Publisher which downloads an image from internet .</p><p>The sample App we will use to understand it, is a GridView of images where we want to download all images simultaneously before rendering</p><br /><img src="parallel-download-using-combine.gif "GridView"" alt="GridView"/><br /><br /><p>Let's set the stage first, we already have a method called <strong>fetchImage</strong> using <strong>URLSession's dataTaskPublisher</strong> to download an image from Internet. I am using this awesome site called <a href="https://picsum.photos/">Picsum Photos</a> to download a random picture from web of given size (in our example it is 80x80 points).</p><br /><pre><code><span class="keyword">private func</span> fetchImage() -&gt; <span class="type">AnyPublisher</span>&lt;<span class="type">Image</span>, <span class="type">Never</span>&gt; {
+        <span class="keyword">let</span> url = <span class="type">URL</span>(string: <span class="string">"https://picsum.photos/80"</span>)!
+        <span class="keyword">return</span> <span class="type">URLSession</span>.<span class="property">shared</span>.<span class="call">dataTaskPublisher</span>(for: url)
+            .<span class="call">map</span> {
+                <span class="keyword">guard let</span> uiImage = <span class="type">UIImage</span>(data: $0.<span class="property">data</span>) <span class="keyword">else</span> {
+                    <span class="keyword">return</span> <span class="type">Image</span>.<span class="property">default</span>
+                }
+                <span class="keyword">return</span> <span class="type">Image</span>(uiImage: uiImage)
+        }
+        .<span class="call">replaceError</span>(with: <span class="type">Image</span>.<span class="property">default</span>)
+        .<span class="call">eraseToAnyPublisher</span>()
+    }
+<span class="keyword">extension</span> <span class="type">Image</span> {
+    <span class="keyword">static var</span> `default` = <span class="type">Image</span>(systemName: <span class="string">"photo"</span>)
+}
+</code></pre><br /><p>Given this method, let's see how we can leverage this to achieve downloading multiple images in parallel. So without any delay let's see the code. All steps in the code are commented to explain what is going on.</p><br /><pre><code><span class="comment">// Download n images</span>
+<span class="keyword">func</span> fetch(n: <span class="type">Int</span>) {
+    <span class="comment">//Make an array of publishers</span> 
+    <span class="keyword">let</span> arrayOfPublishers = (<span class="number">0</span>...n).<span class="call">map</span> { <span class="keyword">_ in</span>
+        <span class="call">fetchImage</span>()
+    }
+    <span class="comment">//Create a publisher of a sequence</span>
+    <span class="type">Publishers</span>.<span class="type">Sequence</span>(sequence: arrayOfPublishers)
+        .<span class="dotAccess">flatMap</span>{ $0 } <span class="comment">//merges the output from all returned publishers into a single stream of Image.
+  										//AnyPublisher&lt;Image, Never&gt; to Image</span>
+        .<span class="call">collect</span>() <span class="comment">//collects all received items and returns them as an array upon completion.
+                   //this is what collects all images and finishes when all are available</span> 
+        .<span class="call">receive</span>(on: <span class="type">RunLoop</span>.<span class="property">main</span>) <span class="comment">// receive on main thread so that we can update our UI with images</span>
+        .<span class="call">sink</span> { <span class="comment">//create a subscription, here the value we will receive is going to be [Image] 
+            //we have all images $0, downloaded now</span> 
+        }
+        .<span class="call">store</span>(in: &amp;cancellableSet) <span class="comment">//so that we retain subscription</span>
+}
+</code></pre><p>The full code is available in this <a href="https://gist.github.com/manojkarki/75869a2bd7df5845f8d4c4fe70493a5d">Github gist</a></p><br /><p>If you have any questions, doubts or feedback <a href="https://yoswift.dev/about/about/">get in touch</a> and I would be happy to help.</p><br /><a href="https://twitter.com/intent/tweet?via=mskarki&amp;text=Download multiple images using Combine&amp;url=https%3A//yoswift.dev/combine/parallel-download-using-combine" rel="nofollow">Tweet this article</a></div><span>Tagged with: </span><br/><ul class="tag-list-combine"><li><a href="/tags/combine">combine</a></li><li><a href="/tags/parallel-download">parallel download</a></li><li><a href="/tags/grid-view">grid view</a></li></ul></article></div><footer><p>Coded in Swift, generated using <a href="https://github.com/johnsundell/publish">Publish</a></p><p><a href="/feed.rss">RSS feed</a></p></footer></body></html>
