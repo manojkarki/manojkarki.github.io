@@ -1,4 +1,66 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Sat, 23 May 2020 15:13:36 +0200</lastBuildDate><pubDate>Sat, 23 May 2020 15:13:36 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/combine/parallel-download-using-combine</guid><title>Multiple simultaneous network requests</title><description>Download multiple images using Combine</description><link>https://yoswift.dev/combine/parallel-download-using-combine</link><pubDate>Sat, 23 May 2020 01:25:00 +0200</pubDate><content:encoded><![CDATA[<h1>Multiple simultaneous network requests</h1><p>Today we will learn how to "combine" multiple publishers to create a new one. This has many use cases for example it can be used to download multiple images in parallel combining an existing Publisher which downloads an image from internet .</p><p>The sample App we will use to understand it, is a GridView of images where we want to download all images simultaneously before rendering</p><br /><img src="parallel-download-using-combine.gif "GridView"" alt="GridView"/><br /><br /><p>Let's set the stage first, we already have a method called <strong>fetchImage</strong> using <strong>URLSession's dataTaskPublisher</strong> to download an image from Internet. I am using this awesome site called <a href="https://picsum.photos/">Picsum Photos</a> to download a random picture from web of given size (in our example it is 80x80 points).</p><br /><pre><code><span class="keyword">private func</span> fetchImage() -&gt; <span class="type">AnyPublisher</span>&lt;<span class="type">Image</span>, <span class="type">Never</span>&gt; {
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Sat, 30 May 2020 17:00:00 +0200</lastBuildDate><pubDate>Sat, 30 May 2020 17:00:00 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/swift/recursive_objects</guid><title>Recursive Objects</title><description>Value type cannot have a stored property that recursively contains it?</description><link>https://yoswift.dev/swift/recursive_objects</link><pubDate>Sat, 30 May 2020 03:48:00 +0200</pubDate><content:encoded><![CDATA[<h1>Recursive Objects</h1><p>Earlier we learnt about how we can <a href="https://yoswift.dev/swift/Tree%20in%20Swift/">implement a binary tree in Swift.</a> Remember we started with a Class and not a struct.</p><p>Let's try to understand the problem with using a struct. Try compiling the code below.</p><pre><code><span class="keyword">struct</span> Node {
+    <span class="keyword">var</span> next: <span class="type">Node</span>
+}
+</code></pre><p>It will not compile and give you an error.</p><blockquote><p><strong>value type 'Node' cannot have a stored property that recursively contains it</strong></p></blockquote><p>The reason is, the compiler need to know the memory size of struct node so that it can allocate memory for variables / constants of this type in <a href="https://en.wikipedia.org/wiki/Stack-based_memory_allocation">Stack</a>. Now due to the recursive nature of the struct it means it is an infinite size and compiler cannot allow it.</p><p>Now, what do you think about the code below</p><pre><code><span class="keyword">struct</span> Node {
+    <span class="keyword">var</span> next: [<span class="type">Node</span>]
+}
+</code></pre><p>Well, it compiles fine, which feels a bit weird to some, if you are confused by this go ahead and read the explanation below.</p><p>If you think about it <code>Array</code> in Swift is also a <em>value type</em> meaning compiler need to know the size of an Array in advance. But also the array need to hold <strong>variable</strong> number of elements which it cannot know in advance and hence it need to allocate memory for those elements in <a href="https://en.wikipedia.org/wiki/Memory_management">heap</a> and hold a reference (or pointer) to that memory.</p><p>The references are fixed size and so Array has a fixed size (size of a reference to actual array elements + other fixed size elements for book keeping and other implementation details.)</p><p>Now it is an Array's implementation detail that gives you value type semantic despite it containing a reference type. It does it <strong>lazily</strong> meaning copying only when required.</p><pre><code><span class="keyword">struct</span> Node {
+    <span class="keyword">var</span> value: <span class="type">Int</span>
+    <span class="keyword">var</span> kids: [<span class="type">Node</span>]
+}
+
+<span class="keyword">var</span> n1 = <span class="type">Node</span>(value: <span class="number">1</span>, kids: [ <span class="type">Node</span>(value: <span class="number">2</span>, kids: []) ])
+<span class="keyword">var</span> n2 = n1
+</code></pre><p>When we copy n1 to n2, we expect a <strong>new memory</strong> for kids array of n2 and all n1's array elements <strong>copied</strong> to it. This is because being a value type we expect a value type semantic from Array. Now to optimize unnecessary copy operations Array can actually delay this copy operation and hold until one of n1 or n2 try to mutate their kids array (e.g. remove or add a new element).</p><p>So far essentially it mean both reference inside n1 and n2 are actually pointing to the same memory location where the elements are stored.</p><pre><code>n2.<span class="property">kids</span>.<span class="call">append</span>(<span class="type">Node</span>(value: <span class="number">3</span>, kids: []))
+</code></pre><p>Now at this point, Array implementation will actually allocate a new memory for holding kids of n2, add the new Node in that memory and change the reference inside n2 to point to this memory.</p><p>All these details are Array's internal implementation details but it is good to know what is going on inside to explain some concepts we get confused with while using an Array.</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swiftui/Should-I-use-EnvironmenObject</guid><title>EnvironmentObject - should I use it.</title><description>Should I use EnvironmenObject</description><link>https://yoswift.dev/swiftui/Should-I-use-EnvironmenObject</link><pubDate>Thu, 28 May 2020 09:12:00 +0200</pubDate><content:encoded><![CDATA[<h1>EnvironmentObject - should I use it.</h1><p>Today's topic is a bit controversial in sense if there are use cases where in SwiftUI we can inject dependencies using EnvironmentObject. First let's see why it is considered a bad practice<br><br><code></code>`swift struct MyView: View { @EnvironmentObject private var viewModel: MyViewModel var body: some View { Text("i = (viewModel.i)") .onTapGesture { self.viewModel.i += 1 } } }</p><p>struct MyView_Previews: PreviewProvider { static var previews: some View { MyView()<br> } }</p><pre><code>
+
+<span class="type">The</span> above code will crash program so you won't see a live preview <span class="keyword">in</span> <span class="type">Xcode</span>.
+
+**<span class="type">Fatal</span> error: <span class="type">No ObservableObject</span> of type <span class="type">MyViewModel</span> found. <span class="type">A View</span>.<span class="call">environmentObject</span>(<span class="keyword">_</span>:) <span class="keyword">for</span> <span class="type">MyViewModel</span> may be missing <span class="keyword">as</span> an ancestor of this view.: file <span class="type">SwiftUI</span>, line <span class="number">0</span>**
+
+<span class="type">The</span> fix <span class="keyword">is</span> to injct the environment which <span class="type">MyView</span> <span class="keyword">is</span> expecting 
+
+`<span class="type">MyView</span>().<span class="call">environmentObject</span>(<span class="type">MyViewModel</span>(i: <span class="number">0</span>))`
+
+<span class="type">So</span> problem #1 <span class="keyword">is</span> that compiler cannot **enforce the requirement to inject <span class="type">EnvironmentObject</span> at compile time** so <span class="keyword">if</span> you miss you'll face a crash at runtime. <span class="type">This</span> <span class="keyword">is</span> similar to discouraging using an implicitly unwrapped optionals <span class="keyword">in</span> <span class="type">Swift</span> code which can crash you program.
+
+<span class="type">Let</span>'s see another use
+
+</code></pre><p>private(set) var preferredMaxLayoutWidth: CGFloat = 0 func makeUIView(context: UIViewRepresentableContext<SUILabel>) -> UILabel {
+        let label = UILabel()
+        label.text = """
+        This is UILabel, one of the most interesting View class in UIKit. 
+        With autolayout and multiline and it often give you some surprises. 
+        Now using it with SwiftUI = 🤯
+        """
+        label.numberOfLines = 0
+        label.preferredMaxLayoutWidth = preferredMaxLayoutWidth
+        label.backgroundColor = UIColor.black
+        label.textColor = UIColor.white
+        return label
+    }
+
+    func updateUIView(_ uiView: UILabel, context: UIViewRepresentableContext<SUILabel>) { }
+}
+```
+
+
+
+```
+struct ContentView: View {
+    var body: some View {
+        VStack {
+            GeometryReader { geometry in
+                SUILabel(preferredMaxLayoutWidth: geometry.size.width)
+                .fixedSize(horizontal: true, vertical: true)
+            }
+        }
+        .frame(width: 200)
+    }
+}
+```
+
+</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/parallel-download-using-combine</guid><title>Multiple simultaneous network requests</title><description>Download multiple images using Combine</description><link>https://yoswift.dev/combine/parallel-download-using-combine</link><pubDate>Sat, 23 May 2020 01:25:00 +0200</pubDate><content:encoded><![CDATA[<h1>Multiple simultaneous network requests</h1><p>Today we will learn how to "combine" multiple publishers to create a new one. This has many use cases for example it can be used to download multiple images in parallel combining an existing Publisher which downloads an image from internet .</p><p>The sample App we will use to understand it, is a GridView of images where we want to download all images simultaneously before rendering</p><br /><img src="parallel-download-using-combine.gif "GridView"" alt="GridView"/><br /><br /><p>Let's set the stage first, we already have a method called <strong>fetchImage</strong> using <strong>URLSession's dataTaskPublisher</strong> to download an image from Internet. I am using this awesome site called <a href="https://picsum.photos/">Picsum Photos</a> to download a random picture from web of given size (in our example it is 80x80 points).</p><br /><pre><code><span class="keyword">private func</span> fetchImage() -&gt; <span class="type">AnyPublisher</span>&lt;<span class="type">Image</span>, <span class="type">Never</span>&gt; {
         <span class="keyword">let</span> url = <span class="type">URL</span>(string: <span class="string">"https://picsum.photos/80"</span>)!
         <span class="keyword">return</span> <span class="type">URLSession</span>.<span class="property">shared</span>.<span class="call">dataTaskPublisher</span>(for: url)
             .<span class="call">map</span> {
@@ -247,17 +309,31 @@ VStack</span> {
     <span class="type">ViewBuilder</span>.<span class="call">buildIf</span>(<span class="call">imageOrNil</span>(isText))
 }
 
-</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swift/readonly-property</guid><title>Readonly properties</title><description>Readonly properties with auto- synthesized intializers.</description><link>https://yoswift.dev/swift/readonly-property</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Readonly properties</h1><p>In a struct you can mark a property readonly like</p><pre><code><span class="keyword">struct</span> Example1 {
-    <span class="keyword">private(set) var</span> value: <span class="type">Int</span>
+</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/keyboard-height</guid><title>Keyboard handling using combine</title><description>Reactive way to handle keyboard height change</description><link>https://yoswift.dev/combine/keyboard-height</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Keyboard handling using combine</h1><pre><code><span class="keyword">static var</span> keyboardHeightPublisher: <span class="type">AnyPublisher</span>&lt;<span class="type">CGFloat</span>, <span class="type">Never</span>&gt; {
+    <span class="keyword">let</span> willShow = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillShowNotification</span>)
+        .<span class="call">map</span> { $0.(userInfo?[<span class="type">UIResponder</span>.<span class="property">keyboardFrameEndUserInfoKey</span>] <span class="keyword">as</span>? <span class="type">CGRect</span>)?.<span class="property">height</span> ?? <span class="number">0</span> }
+
+    <span class="keyword">let</span> willHide = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillHideNotification</span>)
+        .<span class="call">map</span> { <span class="keyword">_ in</span> <span class="type">CGFloat</span>(<span class="number">0</span>) }
+
+    <span class="keyword">return</span> <span class="type">MergeMany</span>(willShow, willHide)
+        .<span class="call">eraseToAnyPublisher</span>()
 }
-</code></pre><p>This is another way of marking a property readonly</p><pre><code><span class="keyword">struct</span> Example2 {
-    <span class="keyword">let</span> value: <span class="type">Int</span>
+</code></pre><p>Now you can subscribe easily to keyboard height changes.</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+    
+    <span class="keyword">@State 
+    private var</span> value: <span class="type">String</span>
+
+    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
+        <span class="type">TextField</span>(<span class="string">"Enter the value"</span>, text: $value)
+            .<span class="call">onReceive</span>(keyboardHeightPublisher) { keyboardHeight <span class="keyword">in
+                if</span> keyboardHeight &gt; <span class="number">0</span> {
+                    <span class="call">print</span>(<span class="string">"Move something up"</span>)
+                }
+            }
+    }
 }
-</code></pre><p>There is an important difference though, the below code will compile just fine</p><pre><code><span class="keyword">var</span> example1 = <span class="type">Example</span>(value: <span class="number">10</span>)
-example1.<span class="property">value</span> = <span class="number">20</span>
-</code></pre><p>while below code will not compile with <span style="color:red"> error: cannot assign to property: 'value' is a 'let' constant </span></p><pre><code><span class="keyword">var</span> example2 = <span class="type">Example2</span>(value: <span class="number">10</span>)
-example2.<span class="property">value</span> = <span class="number">20</span>
-</code></pre><p>and by using private(set) you can provide a default value to your property, and initializer can be called</p><p>with or without an argument.</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swiftui/swiftui-with-uilabel</guid><title>Using UILabel in SwiftUI</title><description>How to use a multiline UILabel in SwiftUI.</description><link>https://yoswift.dev/swiftui/swiftui-with-uilabel</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Using UILabel in SwiftUI</h1><p>But why 😀 well sometime using SwiftUI in an existing App force you to do so.</p><p>So here is a SwiftUI View using <code></code><code>Text</code><code></code></p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+</code></pre>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swiftui/swiftui-with-uilabel</guid><title>Using UILabel in SwiftUI</title><description>How to use a multiline UILabel in SwiftUI.</description><link>https://yoswift.dev/swiftui/swiftui-with-uilabel</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Using UILabel in SwiftUI</h1><p>But why 😀 well sometime using SwiftUI in an existing App force you to do so.</p><p>So here is a SwiftUI View using <code></code><code>Text</code><code></code></p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
     <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
         <span class="type">VStack</span> {
             <span class="type">Text</span>(<span class="string">"This is a SwiftUI text which is easy to use but you need to understand the SwiftUI layout engine."</span>)
@@ -297,28 +373,14 @@ example2.<span class="property">value</span> = <span class="number">20</span>
         .<span class="call">frame</span>(width: <span class="number">200</span>)
     }
 }
-</code></pre><p>The important things to note are, the use of <a href="https://developer.apple.com/documentation/uikit/uilabel/1620534-preferredmaxlayoutwidth"><strong>preferredMaxLayoutWidth</strong></a> onUILabel, <a href="https://developer.apple.com/documentation/swiftui/geometryreader"><strong>GeometryReader</strong></a> to fed it to SUILabel and using <a href="https://developer.apple.com/documentation/swiftui/group/3284808-fixedsize"><strong>fixedSize</strong></a> on SUILabel to force SwiftUIlayout engine to use the original size ( in UIKit words, <a href="https://developer.apple.com/documentation/uikit/uiview/1622600-intrinsiccontentsize">intrinsic content size</a>)</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/keyboard-height</guid><title>Keyboard handling using combine</title><description>Reactive way to handle keyboard height change</description><link>https://yoswift.dev/combine/keyboard-height</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Keyboard handling using combine</h1><pre><code><span class="keyword">static var</span> keyboardHeightPublisher: <span class="type">AnyPublisher</span>&lt;<span class="type">CGFloat</span>, <span class="type">Never</span>&gt; {
-    <span class="keyword">let</span> willShow = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillShowNotification</span>)
-        .<span class="call">map</span> { $0.(userInfo?[<span class="type">UIResponder</span>.<span class="property">keyboardFrameEndUserInfoKey</span>] <span class="keyword">as</span>? <span class="type">CGRect</span>)?.<span class="property">height</span> ?? <span class="number">0</span> }
-
-    <span class="keyword">let</span> willHide = <span class="type">NotificationCenter</span>.<span class="property">default</span>.<span class="call">publisher</span>(for: <span class="type">UIApplication</span>.<span class="property">keyboardWillHideNotification</span>)
-        .<span class="call">map</span> { <span class="keyword">_ in</span> <span class="type">CGFloat</span>(<span class="number">0</span>) }
-
-    <span class="keyword">return</span> <span class="type">MergeMany</span>(willShow, willHide)
-        .<span class="call">eraseToAnyPublisher</span>()
+</code></pre><p>The important things to note are, the use of <a href="https://developer.apple.com/documentation/uikit/uilabel/1620534-preferredmaxlayoutwidth"><strong>preferredMaxLayoutWidth</strong></a> onUILabel, <a href="https://developer.apple.com/documentation/swiftui/geometryreader"><strong>GeometryReader</strong></a> to fed it to SUILabel and using <a href="https://developer.apple.com/documentation/swiftui/group/3284808-fixedsize"><strong>fixedSize</strong></a> on SUILabel to force SwiftUIlayout engine to use the original size ( in UIKit words, <a href="https://developer.apple.com/documentation/uikit/uiview/1622600-intrinsiccontentsize">intrinsic content size</a>)</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swift/readonly-property</guid><title>Readonly properties</title><description>Readonly properties with auto- synthesized intializers.</description><link>https://yoswift.dev/swift/readonly-property</link><pubDate>Sat, 2 May 2020 12:35:00 +0200</pubDate><content:encoded><![CDATA[<h1>Readonly properties</h1><p>In a struct you can mark a property readonly like</p><pre><code><span class="keyword">struct</span> Example1 {
+    <span class="keyword">private(set) var</span> value: <span class="type">Int</span>
 }
-</code></pre><p>Now you can subscribe easily to keyboard height changes.</p><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
-    
-    <span class="keyword">@State 
-    private var</span> value: <span class="type">String</span>
-
-    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
-        <span class="type">TextField</span>(<span class="string">"Enter the value"</span>, text: $value)
-            .<span class="call">onReceive</span>(keyboardHeightPublisher) { keyboardHeight <span class="keyword">in
-                if</span> keyboardHeight &gt; <span class="number">0</span> {
-                    <span class="call">print</span>(<span class="string">"Move something up"</span>)
-                }
-            }
-    }
+</code></pre><p>This is another way of marking a property readonly</p><pre><code><span class="keyword">struct</span> Example2 {
+    <span class="keyword">let</span> value: <span class="type">Int</span>
 }
-</code></pre>]]></content:encoded></item></channel></rss>
+</code></pre><p>There is an important difference though, the below code will compile just fine</p><pre><code><span class="keyword">var</span> example1 = <span class="type">Example</span>(value: <span class="number">10</span>)
+example1.<span class="property">value</span> = <span class="number">20</span>
+</code></pre><p>while below code will not compile with <span style="color:red"> error: cannot assign to property: 'value' is a 'let' constant </span></p><pre><code><span class="keyword">var</span> example2 = <span class="type">Example2</span>(value: <span class="number">10</span>)
+example2.<span class="property">value</span> = <span class="number">20</span>
+</code></pre><p>and by using private(set) you can provide a default value to your property, and initializer can be called</p><p>with or without an argument.</p>]]></content:encoded></item></channel></rss>

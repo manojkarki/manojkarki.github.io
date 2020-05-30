@@ -1,0 +1,49 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="og:site_name" content="YoSwift!"/><link rel="canonical" href="https://yoswift.dev/swiftui/Should-I-use-EnvironmenObject"/><meta name="twitter:url" content="https://yoswift.dev/swiftui/Should-I-use-EnvironmenObject"/><meta name="og:url" content="https://yoswift.dev/swiftui/Should-I-use-EnvironmenObject"/><title>EnvironmentObject - should I use it. | YoSwift!</title><meta name="twitter:title" content="EnvironmentObject - should I use it. | YoSwift!"/><meta name="og:title" content="EnvironmentObject - should I use it. | YoSwift!"/><meta name="description" content="Should I use EnvironmenObject"/><meta name="twitter:description" content="Should I use EnvironmenObject"/><meta name="og:description" content="Should I use EnvironmenObject"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to YoSwift!"/><meta name="twitter:image" content="https://yoswift.dev/images/logo.png"/><meta name="og:image" content="https://yoswift.dev/images/logo.png"/></head><body class="item-page"><header><a id="logo" href="/"><img src="/images/logo.png" alt="Yo! Swift"/></a><nav id="main-navigation"><ul><li><a class="selected" href="/swiftui">SwiftUI</a></li><li><a href="/swift">Swift</a></li><li><a href="/combine">Combine</a></li><li><a href="/about">About</a></li></ul></nav></header><div class="wrapper"><article><div class="content"><h1>EnvironmentObject - should I use it.</h1><p>Today's topic is a bit controversial in sense if there are use cases where in SwiftUI we can inject dependencies using EnvironmentObject. First let's see why it is considered a bad practice<br><br><code></code>`swift struct MyView: View { @EnvironmentObject private var viewModel: MyViewModel var body: some View { Text("i = (viewModel.i)") .onTapGesture { self.viewModel.i += 1 } } }</p><p>struct MyView_Previews: PreviewProvider { static var previews: some View { MyView()<br> } }</p><pre><code>
+
+<span class="type">The</span> above code will crash program so you won't see a live preview <span class="keyword">in</span> <span class="type">Xcode</span>.
+
+**<span class="type">Fatal</span> error: <span class="type">No ObservableObject</span> of type <span class="type">MyViewModel</span> found. <span class="type">A View</span>.<span class="call">environmentObject</span>(<span class="keyword">_</span>:) <span class="keyword">for</span> <span class="type">MyViewModel</span> may be missing <span class="keyword">as</span> an ancestor of this view.: file <span class="type">SwiftUI</span>, line <span class="number">0</span>**
+
+<span class="type">The</span> fix <span class="keyword">is</span> to injct the environment which <span class="type">MyView</span> <span class="keyword">is</span> expecting 
+
+`<span class="type">MyView</span>().<span class="call">environmentObject</span>(<span class="type">MyViewModel</span>(i: <span class="number">0</span>))`
+
+<span class="type">So</span> problem #1 <span class="keyword">is</span> that compiler cannot **enforce the requirement to inject <span class="type">EnvironmentObject</span> at compile time** so <span class="keyword">if</span> you miss you'll face a crash at runtime. <span class="type">This</span> <span class="keyword">is</span> similar to discouraging using an implicitly unwrapped optionals <span class="keyword">in</span> <span class="type">Swift</span> code which can crash you program.
+
+<span class="type">Let</span>'s see another use
+
+</code></pre><p>private(set) var preferredMaxLayoutWidth: CGFloat = 0 func makeUIView(context: UIViewRepresentableContext<SUILabel>) -> UILabel {
+        let label = UILabel()
+        label.text = """
+        This is UILabel, one of the most interesting View class in UIKit. 
+        With autolayout and multiline and it often give you some surprises. 
+        Now using it with SwiftUI = 🤯
+        """
+        label.numberOfLines = 0
+        label.preferredMaxLayoutWidth = preferredMaxLayoutWidth
+        label.backgroundColor = UIColor.black
+        label.textColor = UIColor.white
+        return label
+    }
+
+    func updateUIView(_ uiView: UILabel, context: UIViewRepresentableContext<SUILabel>) { }
+}
+```
+
+
+
+```
+struct ContentView: View {
+    var body: some View {
+        VStack {
+            GeometryReader { geometry in
+                SUILabel(preferredMaxLayoutWidth: geometry.size.width)
+                .fixedSize(horizontal: true, vertical: true)
+            }
+        }
+        .frame(width: 200)
+    }
+}
+```
+
+</p></div><span>Tagged with: </span><br/><ul class="tag-list-swiftui"><li><a href="/tags/swiftui">swiftui</a></li><li><a href="/tags/environmenobject">EnvironmenObject</a></li></ul></article></div><footer><p>Coded in Swift, generated using <a href="https://github.com/johnsundell/publish">Publish</a></p><p><a href="/feed.rss">RSS feed</a></p></footer></body></html>
