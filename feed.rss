@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Sat, 30 May 2020 17:00:00 +0200</lastBuildDate><pubDate>Sat, 30 May 2020 17:00:00 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/swift/recursive_objects</guid><title>Recursive Objects</title><description>Value type cannot have a stored property that recursively contains it?</description><link>https://yoswift.dev/swift/recursive_objects</link><pubDate>Sat, 30 May 2020 03:48:00 +0200</pubDate><content:encoded><![CDATA[<h1>Recursive Objects</h1><p>Earlier we learnt about how we can <a href="https://yoswift.dev/swift/Tree%20in%20Swift/">implement a binary tree in Swift.</a> Remember we started with a Class and not a struct.</p><p>Let's try to understand the problem with using a struct. Try compiling the code below.</p><pre><code><span class="keyword">struct</span> Node {
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content"><channel><title>YoSwift!</title><description>Short tips, tricks and best practices for using Swift, SwiftUI and Combine.</description><link>https://yoswift.dev</link><language>en</language><lastBuildDate>Sun, 31 May 2020 11:38:41 +0200</lastBuildDate><pubDate>Sun, 31 May 2020 11:38:41 +0200</pubDate><ttl>250</ttl><atom:link href="https://yoswift.dev/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://yoswift.dev/swift/recursive_objects</guid><title>Recursive Objects</title><description>Value type cannot have a stored property that recursively contains it?</description><link>https://yoswift.dev/swift/recursive_objects</link><pubDate>Sat, 30 May 2020 03:48:00 +0200</pubDate><content:encoded><![CDATA[<h1>Recursive Objects</h1><p>Earlier we learnt about how we can <a href="https://yoswift.dev/swift/Tree%20in%20Swift/">implement a binary tree in Swift.</a> Remember we started with a Class and not a struct.</p><p>Let's try to understand the problem with using a struct. Try compiling the code below.</p><pre><code><span class="keyword">struct</span> Node {
     <span class="keyword">var</span> next: <span class="type">Node</span>
 }
 </code></pre><p>It will not compile and give you an error.</p><blockquote><p><strong>value type 'Node' cannot have a stored property that recursively contains it</strong></p></blockquote><p>The reason is, the compiler need to know the memory size of struct node so that it can allocate memory for variables / constants of this type in <a href="https://en.wikipedia.org/wiki/Stack-based_memory_allocation">Stack</a>. Now due to the recursive nature of the struct it means it is an infinite size and compiler cannot allow it.</p><p>Now, what do you think about the code below</p><pre><code><span class="keyword">struct</span> Node {
@@ -12,55 +12,7 @@
 <span class="keyword">var</span> n1 = <span class="type">Node</span>(value: <span class="number">1</span>, kids: [ <span class="type">Node</span>(value: <span class="number">2</span>, kids: []) ])
 <span class="keyword">var</span> n2 = n1
 </code></pre><p>When we copy n1 to n2, we expect a <strong>new memory</strong> for kids array of n2 and all n1's array elements <strong>copied</strong> to it. This is because being a value type we expect a value type semantic from Array. Now to optimize unnecessary copy operations Array can actually delay this copy operation and hold until one of n1 or n2 try to mutate their kids array (e.g. remove or add a new element).</p><p>So far essentially it mean both reference inside n1 and n2 are actually pointing to the same memory location where the elements are stored.</p><pre><code>n2.<span class="property">kids</span>.<span class="call">append</span>(<span class="type">Node</span>(value: <span class="number">3</span>, kids: []))
-</code></pre><p>Now at this point, Array implementation will actually allocate a new memory for holding kids of n2, add the new Node in that memory and change the reference inside n2 to point to this memory.</p><p>All these details are Array's internal implementation details but it is good to know what is going on inside to explain some concepts we get confused with while using an Array.</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/swiftui/Should-I-use-EnvironmenObject</guid><title>EnvironmentObject - should I use it.</title><description>Should I use EnvironmenObject</description><link>https://yoswift.dev/swiftui/Should-I-use-EnvironmenObject</link><pubDate>Thu, 28 May 2020 09:12:00 +0200</pubDate><content:encoded><![CDATA[<h1>EnvironmentObject - should I use it.</h1><p>Today's topic is a bit controversial in sense if there are use cases where in SwiftUI we can inject dependencies using EnvironmentObject. First let's see why it is considered a bad practice<br><br><code></code>`swift struct MyView: View { @EnvironmentObject private var viewModel: MyViewModel var body: some View { Text("i = (viewModel.i)") .onTapGesture { self.viewModel.i += 1 } } }</p><p>struct MyView_Previews: PreviewProvider { static var previews: some View { MyView()<br> } }</p><pre><code>
-
-<span class="type">The</span> above code will crash program so you won't see a live preview <span class="keyword">in</span> <span class="type">Xcode</span>.
-
-**<span class="type">Fatal</span> error: <span class="type">No ObservableObject</span> of type <span class="type">MyViewModel</span> found. <span class="type">A View</span>.<span class="call">environmentObject</span>(<span class="keyword">_</span>:) <span class="keyword">for</span> <span class="type">MyViewModel</span> may be missing <span class="keyword">as</span> an ancestor of this view.: file <span class="type">SwiftUI</span>, line <span class="number">0</span>**
-
-<span class="type">The</span> fix <span class="keyword">is</span> to injct the environment which <span class="type">MyView</span> <span class="keyword">is</span> expecting 
-
-`<span class="type">MyView</span>().<span class="call">environmentObject</span>(<span class="type">MyViewModel</span>(i: <span class="number">0</span>))`
-
-<span class="type">So</span> problem #1 <span class="keyword">is</span> that compiler cannot **enforce the requirement to inject <span class="type">EnvironmentObject</span> at compile time** so <span class="keyword">if</span> you miss you'll face a crash at runtime. <span class="type">This</span> <span class="keyword">is</span> similar to discouraging using an implicitly unwrapped optionals <span class="keyword">in</span> <span class="type">Swift</span> code which can crash you program.
-
-<span class="type">Let</span>'s see another use
-
-</code></pre><p>private(set) var preferredMaxLayoutWidth: CGFloat = 0 func makeUIView(context: UIViewRepresentableContext<SUILabel>) -> UILabel {
-        let label = UILabel()
-        label.text = """
-        This is UILabel, one of the most interesting View class in UIKit. 
-        With autolayout and multiline and it often give you some surprises. 
-        Now using it with SwiftUI = 🤯
-        """
-        label.numberOfLines = 0
-        label.preferredMaxLayoutWidth = preferredMaxLayoutWidth
-        label.backgroundColor = UIColor.black
-        label.textColor = UIColor.white
-        return label
-    }
-
-    func updateUIView(_ uiView: UILabel, context: UIViewRepresentableContext<SUILabel>) { }
-}
-```
-
-
-
-```
-struct ContentView: View {
-    var body: some View {
-        VStack {
-            GeometryReader { geometry in
-                SUILabel(preferredMaxLayoutWidth: geometry.size.width)
-                .fixedSize(horizontal: true, vertical: true)
-            }
-        }
-        .frame(width: 200)
-    }
-}
-```
-
-</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/parallel-download-using-combine</guid><title>Multiple simultaneous network requests</title><description>Download multiple images using Combine</description><link>https://yoswift.dev/combine/parallel-download-using-combine</link><pubDate>Sat, 23 May 2020 01:25:00 +0200</pubDate><content:encoded><![CDATA[<h1>Multiple simultaneous network requests</h1><p>Today we will learn how to "combine" multiple publishers to create a new one. This has many use cases for example it can be used to download multiple images in parallel combining an existing Publisher which downloads an image from internet .</p><p>The sample App we will use to understand it, is a GridView of images where we want to download all images simultaneously before rendering</p><br /><img src="parallel-download-using-combine.gif "GridView"" alt="GridView"/><br /><br /><p>Let's set the stage first, we already have a method called <strong>fetchImage</strong> using <strong>URLSession's dataTaskPublisher</strong> to download an image from Internet. I am using this awesome site called <a href="https://picsum.photos/">Picsum Photos</a> to download a random picture from web of given size (in our example it is 80x80 points).</p><br /><pre><code><span class="keyword">private func</span> fetchImage() -&gt; <span class="type">AnyPublisher</span>&lt;<span class="type">Image</span>, <span class="type">Never</span>&gt; {
+</code></pre><p>Now at this point, Array implementation will actually allocate a new memory for holding kids of n2, add the new Node in that memory and change the reference inside n2 to point to this memory.</p><p>All these details are Array's internal implementation details but it is good to know what is going on inside to explain some concepts we get confused with while using an Array.</p>]]></content:encoded></item><item><guid isPermaLink="true">https://yoswift.dev/combine/parallel-download-using-combine</guid><title>Multiple simultaneous network requests</title><description>Download multiple images using Combine</description><link>https://yoswift.dev/combine/parallel-download-using-combine</link><pubDate>Sat, 23 May 2020 01:25:00 +0200</pubDate><content:encoded><![CDATA[<h1>Multiple simultaneous network requests</h1><p>Today we will learn how to "combine" multiple publishers to create a new one. This has many use cases for example it can be used to download multiple images in parallel combining an existing Publisher which downloads an image from internet .</p><p>The sample App we will use to understand it, is a GridView of images where we want to download all images simultaneously before rendering</p><br /><img src="parallel-download-using-combine.gif "GridView"" alt="GridView"/><br /><br /><p>Let's set the stage first, we already have a method called <strong>fetchImage</strong> using <strong>URLSession's dataTaskPublisher</strong> to download an image from Internet. I am using this awesome site called <a href="https://picsum.photos/">Picsum Photos</a> to download a random picture from web of given size (in our example it is 80x80 points).</p><br /><pre><code><span class="keyword">private func</span> fetchImage() -&gt; <span class="type">AnyPublisher</span>&lt;<span class="type">Image</span>, <span class="type">Never</span>&gt; {
         <span class="keyword">let</span> url = <span class="type">URL</span>(string: <span class="string">"https://picsum.photos/80"</span>)!
         <span class="keyword">return</span> <span class="type">URLSession</span>.<span class="property">shared</span>.<span class="call">dataTaskPublisher</span>(for: url)
             .<span class="call">map</span> {
