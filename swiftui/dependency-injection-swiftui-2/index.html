@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="og:site_name" content="YoSwift!"/><link rel="canonical" href="https://yoswift.dev/swiftui/dependency-injection-swiftui-2"/><meta name="twitter:url" content="https://yoswift.dev/swiftui/dependency-injection-swiftui-2"/><meta name="og:url" content="https://yoswift.dev/swiftui/dependency-injection-swiftui-2"/><title>Dependency Injection in SwiftUI - 2 | YoSwift!</title><meta name="twitter:title" content="Dependency Injection in SwiftUI - 2 | YoSwift!"/><meta name="og:title" content="Dependency Injection in SwiftUI - 2 | YoSwift!"/><meta name="description" content="Dependency Injection in SwiftUI - 2"/><meta name="twitter:description" content="Dependency Injection in SwiftUI - 2"/><meta name="og:description" content="Dependency Injection in SwiftUI - 2"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to YoSwift!"/><meta name="twitter:image" content="https://yoswift.dev/images/logo.png"/><meta name="og:image" content="https://yoswift.dev/images/logo.png"/></head><body class="item-page"><header><a id="logo" href="/"><img src="/images/logo.png" alt="Yo! Swift"/></a><nav id="main-navigation"><ul><li><a class="selected" href="/swiftui">SwiftUI</a></li><li><a href="/swift">Swift</a></li><li><a href="/combine">Combine</a></li><li><a href="/about">About</a></li><li><a href="/apps">Apps</a></li></ul></nav></header><div class="wrapper"><article><div class="content"><h1>Dependency Injection in SwiftUI - 2</h1><p><a href="https://yoswift.dev/swiftui/dependency-injection-swiftui-1/">Start with part one of this post</a></p><p>In the first part we discussed how SwiftUI declarative syntax made Dependency Injection <strong>DI</strong> a bit magical and tried to understand the magic. Now let's see how to receive the injected values in your Views and also how to inject your custom types into your View hierarchy.</p><br /><p>To read the value from the EnvironmentValues injected by the parent you need to use a property wrapper called <a href="https://developer.apple.com/documentation/swiftui/environment">Environment</a></p><p>Just pass the <strong>KeyPath&lt;EnvironmentValues, Value&gt;</strong> of property in the Environment property wrapper's initializer that you want to use in your view. You can ignore writing the type (Font? In this example) as it is inferred from the key path in initializer.</p><br /><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+  <span class="keyword">@Environment</span>(\.<span class="property">font</span>) <span class="keyword">var</span> font
+    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
+        <span class="type">Text</span>(<span class="string">"Hello world"</span>)
+            **.<span class="call">font</span>(font)**
+    }
+}
+</code></pre><br /><p>Easy right? Now lets see how you can inject your custom dependencies, things that are not available in <strong>EnvironmentValues</strong></p><p>Let's say you have this struct below that you created in your root view and want to make it available to all views in the tree rooted at root view (without obviously passing through initializer of all views)</p><br /><pre><code><span class="keyword">struct</span> MyDependency {
+  <span class="keyword">var</span> i = <span class="number">10</span>
+}
+</code></pre><br /><p>All the <strong>EnvironmentValues</strong> of a view hierarchy are stored by a type represented by <a href="https://developer.apple.com/documentation/swiftui/environmentkey">EnvironmentKey</a>, which is a protocol with just one requirement which is to <em>provide a default value of your dependency</em>. This is so that SwiftUI can use the default value if nothing is injected from any of the view above the view using it. If you don't have a reasonable default you can always use nil (and make the type as an Optional).</p><p>So let's create a key for our dependency MyDependency</p><br /><pre><code><span class="keyword">struct</span> MyDependencyKey: <span class="type">EnvironmentKey</span> {
+  <span class="keyword">static var</span> defaultValue: <span class="type">MyDependency</span> = <span class="type">MyDependency</span>()
+}
+</code></pre><p>Now we need to extend <strong>EnvironmentValues</strong> to add a computed property to access our dependency.</p><br /><pre><code><span class="keyword">extension</span> <span class="type">EnvironmentValues</span> {
+    <span class="keyword">var</span> myDependency: <span class="type">MyDependency</span> {
+        <span class="keyword">get</span> {
+            <span class="keyword">self</span>[<span class="type">MyDependencyKey</span>.<span class="keyword">self</span>]
+        }
+        <span class="keyword">set</span> {
+            <span class="keyword">self</span>[<span class="type">MyDependencyKey</span>.<span class="keyword">self</span>] = newValue
+        }
+    }
+}
+</code></pre><p>The subscript syntax above is possible because of custom subscript implementation in <strong>EnvironmentValues</strong></p><pre><code><span class="keyword">subscript</span>&lt;K&gt;(key: <span class="type">K</span>.<span class="type">Type</span>) -&gt; <span class="type">K</span>.<span class="type">Value</span> <span class="keyword">where</span> <span class="type">K</span> : <span class="type">EnvironmentKey</span>
+</code></pre><br /><p>Now injecting dependency is as easy as how we injected font earlier.</p><br /><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
+        <span class="type">VStack</span> {
+            <span class="type">YourCustomView</span>()
+        }
+        **.<span class="call">environment</span>(\<span class="type">EnvironmentValues</span>.<span class="property">myDependency</span>, <span class="type">MyDependency</span>(i: <span class="number">100</span>))**
+    }
+}
+</code></pre><br /><p>If you want you can also add some syntactic sugar over it</p><br /><pre><code><span class="keyword">extension</span> <span class="type">View</span> {
+    <span class="keyword">func</span> inject(<span class="keyword">_</span> myDependency: <span class="type">MyDependency</span>) -&gt; <span class="keyword">some</span> <span class="type">View</span> {
+        <span class="call">environment</span>(\.<span class="property">myDependency</span>, myDependency)
+    }
+}
+</code></pre><br /><p>And now usage will be a little more fancier</p><br /><pre><code><span class="keyword">struct</span> ContentView: <span class="type">View</span> {
+    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
+        <span class="type">VStack</span> {
+            <span class="type">YourCustomView</span>()
+        }
+        .<span class="call">inject</span>(<span class="type">MyDependency</span>(i: <span class="number">100</span>))
+    }
+}
+</code></pre><br /><p>That is all.</p><br /><a href="https://twitter.com/intent/tweet?via=mskarki&amp;text=Dependency Injection in SwiftUI [ ]&amp;url=https%3A//yoswift.dev/swiftui/dependency-injection-swiftui-2/" rel="nofollow">If you liked this article share this with others</a></div><span>Tagged with: </span><br/><ul class="tag-list-swiftui"><li><a href="/tags/swiftui">SwiftUI</a></li><li><a href="/tags/dependency-injection">Dependency Injection</a></li><li><a href="/tags/environment">Environment</a></li></ul></article></div><footer><p>Coded in Swift, generated using <a href="https://github.com/johnsundell/publish">Publish</a></p><p><a href="/feed.rss">RSS feed</a></p></footer></body></html>
